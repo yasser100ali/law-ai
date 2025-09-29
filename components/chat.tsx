@@ -11,6 +11,7 @@ import { useChat } from "ai/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 // Why Hire Me Panel Component
 function WhyHireMePanel() {
@@ -183,6 +184,7 @@ export function Chat() {
   const [splitScreenMode, setSplitScreenMode] = React.useState<"none" | "whyhire" | "eveideas">("none");
   const [panelVisible, setPanelVisible] = React.useState(false);
   const rightPanelRef = React.useRef<HTMLDivElement | null>(null);
+  const hasMessages = messages.length > 0;
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -221,11 +223,66 @@ export function Chat() {
         }}
       >
         <div className="flex flex-col h-full bg-background overflow-hidden">
+          {/* Sticky header that appears after first message */}
+          {hasMessages && (
+            <motion.div
+              initial={{ y: -100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ 
+                duration: 0.6, 
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+              className="flex-shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+            >
+              <div className="px-4 py-3">
+                <div className="flex items-center justify-between gap-4 max-w-3xl mx-auto">
+                  <motion.div 
+                    className="flex flex-col gap-0.5"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.3 }}
+                  >
+                    <p className="text-white font-semibold text-lg leading-tight">
+                      Project Eve 
+                    </p>
+                    <p className="text-gray-400 font-normal text-sm">
+                      by Yasser Ali
+                    </p>
+                  </motion.div>
+                  <motion.div 
+                    className="flex flex-row gap-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.3 }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="px-3 py-1.5 text-sm font-semibold"
+                      onClick={handleWhyHireMe}
+                    >
+                      Why hire me?
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="px-3 py-1.5 text-sm font-semibold"
+                      onClick={handleEveIdeas}
+                    >
+                      Ideas to make Eve dominate
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           <div
             ref={messagesContainerRef}
             className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-auto pt-4 px-4"
           >
-            {messages.length === 0 && (
+            {/* Show overview centered when no messages */}
+            {!hasMessages && (
               <Overview 
                 onWhyHireMe={handleWhyHireMe}
                 onEveIdeas={handleEveIdeas}
