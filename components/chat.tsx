@@ -286,6 +286,13 @@ export function Chat() {
               <Overview 
                 onWhyHireMe={handleWhyHireMe}
                 onEveIdeas={handleEveIdeas}
+                onSuggestedPrompt={(prompt) => {
+                  setInput(prompt);
+                  // Automatically submit after a short delay to allow the input to update
+                  setTimeout(() => {
+                    handleSubmit();
+                  }, 100);
+                }}
               />
             )}
 
