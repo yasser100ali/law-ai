@@ -31,12 +31,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <head></head>
-      <body className={cn(GeistSans.className, "antialiased dark")}>
+      <body className={cn(GeistSans.className, "antialiased dark h-full overflow-hidden")}>
         <Toaster position="top-center" richColors />
-        <Navbar />
-        {children}
+        <div className="flex flex-col h-full">
+          <Navbar />
+          <div className="flex-1 overflow-hidden">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

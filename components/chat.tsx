@@ -212,18 +212,18 @@ export function Chat() {
   };
 
   return (
-    <div className="flex min-h-[100dvh] bg-background">
+    <div className="flex h-full overflow-hidden bg-background">
       {/* Chat area */}
       <div
-        className={cn("flex flex-col min-h-[100dvh] transition-[width] duration-300 ease-out")}
+        className={cn("flex flex-col h-full transition-[width] duration-300 ease-out overflow-hidden")}
         style={{
           width: panelVisible ? "50%" : "100%",
         }}
       >
-        <div className="flex flex-col min-w-0 h-[calc(100dvh-52px)] bg-background">
+        <div className="flex flex-col h-full bg-background overflow-hidden">
           <div
             ref={messagesContainerRef}
-            className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
+            className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-auto pt-4 px-4"
           >
             {messages.length === 0 && (
               <Overview 
@@ -251,7 +251,7 @@ export function Chat() {
             />
           </div>
 
-          <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
+          <div className="flex-shrink-0 mx-auto px-4 bg-background pb-4 md:pb-6 w-full md:max-w-3xl">
             <MultimodalInput
               chatId={chatId}
               input={input}
@@ -263,7 +263,7 @@ export function Chat() {
               setMessages={setMessages}
               append={append}
             />
-          </form>
+          </div>
         </div>
       </div>
 
@@ -271,10 +271,10 @@ export function Chat() {
       {(splitScreenMode !== "none" || panelVisible) && (
         <div
           ref={rightPanelRef}
-          className="flex flex-col border-l bg-background transition-[width] duration-300 ease-out overflow-hidden"
+          className="flex flex-col h-full border-l bg-background transition-[width] duration-300 ease-out overflow-hidden"
           style={{ width: panelVisible ? "50%" : "0%" }}
         >
-          <div className="p-2">
+          <div className="flex-shrink-0 p-2">
             <Button
               type="button"
               size="icon"
@@ -287,7 +287,7 @@ export function Chat() {
             </Button>
           </div>
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
             {splitScreenMode === "whyhire" && <WhyHireMePanel />}
             {splitScreenMode === "eveideas" && <EveIdeasPanel />}
           </div>

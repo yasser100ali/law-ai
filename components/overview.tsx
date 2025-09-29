@@ -11,7 +11,7 @@ export const Overview = ({ onWhyHireMe, onEveIdeas }: OverviewProps) => {
   return (
     <motion.div
       key="overview"
-      className="w-full mx-auto max-w-3xl px-14 md:mt-24"
+      className="w-full mx-auto max-w-3xl px-10 md:mt-24"
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
