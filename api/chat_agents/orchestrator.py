@@ -5,6 +5,7 @@ import os
 import re
 import csv
 import requests
+import base64
 from io import BytesIO, StringIO
 from typing import List, Any, Dict, AsyncIterator
 from dotenv import load_dotenv
@@ -17,8 +18,13 @@ from .lawyer_and_plaintiff_agents import plaintiffAgent, lawyerAgent
 
 logger = logging.getLogger(__name__)
 
-def extract_pdf_text(url: str) -> str:
-    """Extract text from PDF file using pypdf"""
+def extract_pdf_text_from_url(url: str, max_chars: int = 50000) -> str:
+    """Extract text from PDF file from URL using pypdf
+    
+    Args:
+        url: URL to the PDF file
+        max_chars: Maximum characters to extract (default 50000 ~ 12-15k tokens)
+    """
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -26,37 +32,146 @@ def extract_pdf_text(url: str) -> str:
         pdf_file = BytesIO(response.content)
         pdf_reader = PdfReader(pdf_file)
         
+        total_pages = len(pdf_reader.pages)
         text = ""
-        for page in pdf_reader.pages:
+        truncated = False
+        
+        for i, page in enumerate(pdf_reader.pages, 1):
+            if len(text) >= max_chars:
+                truncated = True
+                break
+                
             page_text = page.extract_text()
             if page_text:  # Guard against None
-                text += page_text + "\n"
+                # Check if adding this page would exceed limit
+                if len(text) + len(page_text) > max_chars:
+                    remaining = max_chars - len(text)
+                    text += page_text[:remaining] + f"\n\n[Content truncated at {remaining} characters on page {i}]"
+                    truncated = True
+                    break
+                else:
+                    text += f"\n--- Page {i} ---\n{page_text}"
+        
+        result = text.strip()
+        
+        if truncated:
+            result += f"\n\n[Note: PDF has {total_pages} pages. Content was truncated to fit context limits. Only the first {len(result)} characters are shown.]"
+        else:
+            result = f"[PDF contains {total_pages} pages, {len(result)} characters]\n\n{result}"
             
-        return text.strip()
+        return result
     except Exception as e:
-        logger.error(f"Error extracting PDF text: {e}")
+        logger.error(f"Error extracting PDF text from URL: {e}")
+        return f"[Error reading PDF: {str(e)}]"
+
+def extract_pdf_text_from_base64(base64_data: str, max_chars: int = 50000) -> str:
+    """Extract text from PDF file from base64 data URL using pypdf
+    
+    Args:
+        base64_data: Base64 encoded PDF data
+        max_chars: Maximum characters to extract (default 50000 ~ 12-15k tokens)
+    """
+    try:
+        # Remove the data URL prefix if present (e.g., "data:application/pdf;base64,")
+        if "base64," in base64_data:
+            base64_data = base64_data.split("base64,")[1]
+        
+        # Decode base64 to bytes
+        pdf_bytes = base64.b64decode(base64_data)
+        
+        # Create BytesIO object and read PDF
+        pdf_file = BytesIO(pdf_bytes)
+        pdf_reader = PdfReader(pdf_file)
+        
+        total_pages = len(pdf_reader.pages)
+        text = ""
+        truncated = False
+        
+        for i, page in enumerate(pdf_reader.pages, 1):
+            if len(text) >= max_chars:
+                truncated = True
+                break
+                
+            page_text = page.extract_text()
+            if page_text:  # Guard against None
+                # Check if adding this page would exceed limit
+                if len(text) + len(page_text) > max_chars:
+                    remaining = max_chars - len(text)
+                    text += page_text[:remaining] + f"\n\n[Content truncated at {remaining} characters on page {i}]"
+                    truncated = True
+                    break
+                else:
+                    text += f"\n--- Page {i} ---\n{page_text}"
+        
+        result = text.strip()
+        
+        if truncated:
+            result += f"\n\n[Note: PDF has {total_pages} pages. Content was truncated to fit context limits. Only the first {len(result)} characters are shown.]"
+        else:
+            result = f"[PDF contains {total_pages} pages, {len(result)} characters]\n\n{result}"
+        
+        return result
+    except Exception as e:
+        logger.error(f"Error extracting PDF text from base64: {e}")
         return f"[Error reading PDF: {str(e)}]"
 
 
 
 def process_file_content(content: str) -> str:
     """Process message content and extract file contents"""
-    # Pattern to match file references: [File: filename (mediaType) - URL: url]
-    file_pattern = r'\[File: ([^(]+) \(([^)]+)\) - URL: ([^\]]+)\]'
+    # Pattern for URL-based files: [File: filename (mediaType) - URL: url]
+    url_file_pattern = r'\[File: ([^(]+) \(([^)]+)\) - URL: ([^\]]+)\]'
     
-    def replace_file_ref(match):
+    # Pattern for base64 content: [File: filename (mediaType) - Content: base64data]
+    content_file_pattern = r'\[File: ([^(]+) \(([^)]+)\) - Content: ([^\]]+)\]'
+    
+    def replace_url_file_ref(match):
         filename = match.group(1).strip()
         media_type = match.group(2).strip()
         url = match.group(3).strip()
         
         if media_type == 'application/pdf':
-            file_content = extract_pdf_text(url)
+            file_content = extract_pdf_text_from_url(url)
             return f"[PDF File: {filename}]\n{file_content}\n[End of PDF]"
-        
         else:
             return f"[File: {filename} ({media_type}) - Content not processed]"
     
-    return re.sub(file_pattern, replace_file_ref, content)
+    def replace_content_file_ref(match):
+        filename = match.group(1).strip()
+        media_type = match.group(2).strip()
+        base64_content = match.group(3).strip()
+        max_text_chars = 30000  # Limit for text files
+        
+        if media_type == 'application/pdf':
+            file_content = extract_pdf_text_from_base64(base64_content)
+            return f"\n\n[PDF File: {filename}]\n{file_content}\n[End of PDF]\n\n"
+        elif media_type in ['text/plain', 'text/csv']:
+            # Decode text files directly
+            try:
+                if "base64," in base64_content:
+                    base64_content = base64_content.split("base64,")[1]
+                text_content = base64.b64decode(base64_content).decode('utf-8')
+                
+                # Truncate if too long
+                if len(text_content) > max_text_chars:
+                    truncated = text_content[:max_text_chars]
+                    return f"\n\n[Text File: {filename}]\n{truncated}\n\n[Content truncated. Showing first {max_text_chars} of {len(text_content)} characters]\n[End of File]\n\n"
+                else:
+                    return f"\n\n[Text File: {filename}]\n{text_content}\n[End of File]\n\n"
+            except Exception as e:
+                logger.error(f"Error decoding text file: {e}")
+                return f"[File: {filename} - Error decoding: {str(e)}]"
+        elif media_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']:
+            # For Excel/CSV files, just note that it's attached
+            return f"\n\n[Excel/CSV File: {filename} - Data file attached]\n\n"
+        else:
+            return f"[File: {filename} ({media_type}) - Content not processed]"
+    
+    # Process both patterns
+    processed = re.sub(url_file_pattern, replace_url_file_ref, content)
+    processed = re.sub(content_file_pattern, replace_content_file_ref, processed)
+    
+    return processed
 
 
 
