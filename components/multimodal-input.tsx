@@ -661,14 +661,14 @@ export function MultimodalInput({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        <div className="flex w-full p-4 pr-14">
+        <div className="flex w-full p-4 pr-14 pb-14">
           <Textarea
             ref={textareaRef}
             placeholder="Send a message..."
             value={input}
             onChange={handleInput}
             className={cn(
-              "min-h-[80px] max-h-[calc(75dvh)] w-full resize-none border-none bg-transparent !text-base shadow-none focus-visible:ring-0 pt-0 pl-0 pr-0",
+              "min-h-[80px] max-h-[calc(75dvh)] w-full resize-none border-none bg-transparent !text-base shadow-none focus-visible:ring-0 pt-0 pl-0 pr-0 pb-0",
               className,
             )}
             rows={3}
