@@ -653,23 +653,76 @@ export function MultimodalInput({
 
       <div
         className={cn(
-          "flex w-full items-end gap-2 rounded-xl border bg-muted p-2 transition-colors",
-          isDragOver && "bg-primary/20",
+          "relative flex w-full rounded-2xl border border-border/60 bg-muted/50 transition-all hover:border-border",
+          isDragOver && "bg-primary/20 border-primary/40",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
+        <div className="flex w-full p-4 pr-14">
+          <Textarea
+            ref={textareaRef}
+            placeholder="Send a message..."
+            value={input}
+            onChange={handleInput}
+            className={cn(
+              "min-h-[80px] max-h-[calc(75dvh)] w-full resize-none border-none bg-transparent !text-base shadow-none focus-visible:ring-0 pt-0 pl-0 pr-0",
+              className,
+            )}
+            rows={3}
+            autoFocus
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+
+                if (isLoading) {
+                  toast.error(
+                    "Please wait for the model to finish its response!",
+                  );
+                } else {
+                  submitForm();
+                }
+              }
+            }}
+          />
+        </div>
+
         <Button
           variant="ghost"
           size="icon"
-          className="flex-shrink-0"
+          className="absolute bottom-3 left-3 flex-shrink-0 h-9 w-9"
           onClick={handleAttachClick}
         >
           <Paperclip className="h-5 w-5" />
           <span className="sr-only">Attach file</span>
         </Button>
+
+        {isLoading ? (
+          <Button
+            className="absolute bottom-3 right-3 rounded-full p-2 h-9 w-9 flex-shrink-0"
+            onClick={(event) => {
+              event.preventDefault();
+              stop();
+              setMessages((messages) => sanitizeUIMessages(messages));
+            }}
+          >
+            <StopIcon size={16} />
+          </Button>
+        ) : (
+          <Button
+            className="absolute bottom-3 right-3 rounded-full p-2 h-9 w-9 flex-shrink-0"
+            onClick={(event) => {
+              event.preventDefault();
+              submitForm();
+            }}
+            disabled={input.length === 0 && attachments.length === 0}
+          >
+            <ArrowUpIcon size={16} />
+          </Button>
+        )}
+
         <input
           type="file"
           ref={fileInputRef}
@@ -677,56 +730,6 @@ export function MultimodalInput({
           onChange={handleFileChange}
           multiple
         />
-
-        <Textarea
-          ref={textareaRef}
-          placeholder="Send a message..."
-          value={input}
-          onChange={handleInput}
-          className={cn(
-            "min-h-[24px] max-h-[calc(75dvh)] w-full resize-none border-none bg-transparent !text-base shadow-none focus-visible:ring-0",
-            className,
-          )}
-          rows={1}
-          autoFocus
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-
-              if (isLoading) {
-                toast.error(
-                  "Please wait for the model to finish its response!",
-                );
-              } else {
-                submitForm();
-              }
-            }
-          }}
-        />
-
-        {isLoading ? (
-          <Button
-            className="rounded-full p-1.5 h-fit"
-            onClick={(event) => {
-              event.preventDefault();
-              stop();
-              setMessages((messages) => sanitizeUIMessages(messages));
-            }}
-          >
-            <StopIcon size={14} />
-          </Button>
-        ) : (
-          <Button
-            className="rounded-full p-1.5 h-fit"
-            onClick={(event) => {
-              event.preventDefault();
-              submitForm();
-            }}
-            disabled={input.length === 0 && attachments.length === 0}
-          >
-            <ArrowUpIcon size={14} />
-          </Button>
-        )}
       </div>
     </div>
   );
