@@ -18,11 +18,11 @@ export const Overview = ({ onWhyHireMe, onEveIdeas }: OverviewProps) => {
       transition={{ delay: 0.5 }}
     >
       <div className="flex flex-col gap-4 leading-relaxed text-left">
-        <div className="flex flex-col gap-1">
-          <p className="text-white font-semibold text-3xl">
-            Project Eve 
+        <div className="flex flex-col gap-2">
+          <p className="text-white font-medium text-3xl tracking-tight">
+            Project Dedicated to the Eve AI team
           </p>
-          <p className="text-gray-400 font-normal text-xl">
+          <p className="text-muted-foreground font-normal text-xl tracking-tight">
             by Yasser Ali
           </p>
         </div>

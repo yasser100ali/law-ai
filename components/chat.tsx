@@ -242,10 +242,10 @@ export function Chat() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.3 }}
                   >
-                    <p className="text-white font-semibold text-lg leading-tight">
-                      Project Eve 
+                    <p className="text-white font-medium text-lg leading-tight tracking-tight">
+                      Project Dedicated to the Eve AI team
                     </p>
-                    <p className="text-gray-400 font-normal text-sm">
+                    <p className="text-muted-foreground font-normal text-sm tracking-tight">
                       by Yasser Ali
                     </p>
                   </motion.div>
