@@ -313,10 +313,10 @@ export function Chat() {
             {!hasMessages && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                 {[
-                  { title: "Tell me about Yasser", action: "Tell me about Yasser" },
-                  { title: "How to use this chatbot", action: "How to use this chatbot" },
-                  { title: "Help me figure out which case I should take", action: "Help me figure out which case I should take" },
-                  { title: "How can you help me figure out how strong my case is?", action: "How can you help me figure out how strong my case is?" },
+                  { title: "Tell me about Yasser.", action: "Tell me about Yasser" },
+                  { title: "How can I use this chatbot?", action: "How can I use this chatbot?" },
+                  { title: "How do you determine how strong a case is?", action: "How do you determine how strong a case is?" },
+                  { title: "How can I reduce hallucinations?", action: "How can I reduce hallucinations?" },
                 ].map((prompt, index) => (
                   <motion.div
                     key={`suggested-${index}`}
@@ -334,7 +334,7 @@ export function Chat() {
                       }}
                       className="w-full h-auto justify-start items-start text-left border border-border/40 rounded-xl px-4 py-3 hover:bg-accent/50 hover:border-border transition-all"
                     >
-                      <span className="text-sm text-muted-foreground font-normal">
+                      <span className="text-sm text-foreground/80 font-normal">
                         {prompt.title}
                       </span>
                     </Button>
