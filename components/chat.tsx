@@ -286,13 +286,6 @@ export function Chat() {
               <Overview 
                 onWhyHireMe={handleWhyHireMe}
                 onEveIdeas={handleEveIdeas}
-                onSuggestedPrompt={(prompt) => {
-                  setInput(prompt);
-                  // Automatically submit after a short delay to allow the input to update
-                  setTimeout(() => {
-                    handleSubmit();
-                  }, 100);
-                }}
               />
             )}
 
@@ -316,6 +309,40 @@ export function Chat() {
           </div>
 
           <div className="flex-shrink-0 mx-auto px-4 bg-background pb-4 md:pb-6 w-full md:max-w-3xl">
+            {/* Suggested Prompts - only show when no messages */}
+            {!hasMessages && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                {[
+                  { title: "Tell me about Yasser", action: "Tell me about Yasser" },
+                  { title: "How to use this chatbot", action: "How to use this chatbot" },
+                  { title: "Help me figure out which case I should take", action: "Help me figure out which case I should take" },
+                  { title: "How can you help me figure out how strong my case is?", action: "How can you help me figure out how strong my case is?" },
+                ].map((prompt, index) => (
+                  <motion.div
+                    key={`suggested-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 + index * 0.1, duration: 0.3 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setInput(prompt.action);
+                        setTimeout(() => {
+                          handleSubmit();
+                        }, 100);
+                      }}
+                      className="w-full h-auto justify-start items-start text-left border border-border/40 rounded-xl px-4 py-3 hover:bg-accent/50 hover:border-border transition-all"
+                    >
+                      <span className="text-sm text-muted-foreground font-normal">
+                        {prompt.title}
+                      </span>
+                    </Button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+            
             <MultimodalInput
               chatId={chatId}
               input={input}
