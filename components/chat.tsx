@@ -84,7 +84,7 @@ function EveIdeasPanel() {
 
           <div className="bg-muted/50 rounded-lg p-6 space-y-3">
             <h3 className="text-xl font-semibold text-foreground">💰 Premium Placement Model</h3>
-            <p>Create transparent lead-gen channel: Offer firms <strong>"Premium Placement"</strong> (clearly labeled "Sponsored") that prioritizes their listing within jurisdiction/practice-area fit—balancing revenue with user trust.</p>
+            <p>Create transparent lead-gen channel: Offer firms <strong>&ldquo;Premium Placement&rdquo;</strong> (clearly labeled &ldquo;Sponsored&rdquo;) that prioritizes their listing within jurisdiction/practice-area fit—balancing revenue with user trust.</p>
           </div>
 
           <div className="bg-muted/50 rounded-lg p-6 space-y-3">
@@ -128,7 +128,7 @@ function EveIdeasPanel() {
               <li>Show citation sources inline</li>
               <li>Provide checklists and structured outputs</li>
               <li>Human-in-the-loop for low-confidence answers</li>
-              <li>"Explain-your-answer" mode for transparency</li>
+              <li>&ldquo;Explain-your-answer&rdquo; mode for transparency</li>
             </ul>
           </div>
 
