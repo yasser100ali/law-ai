@@ -43,7 +43,7 @@ export const Overview = ({ onWhyHireMe, onEveIdeas }: OverviewProps) => {
             className="px-6 py-3 font-semibold"
             onClick={onEveIdeas}
           >
-            Ideas to make Eve dominate
+            How Eve will dominate.
           </Button>
         </div>
       </div>

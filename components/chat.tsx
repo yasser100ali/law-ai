@@ -13,122 +13,157 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-// Why Hire Me Panel Component
+
 function WhyHireMePanel() {
   return (
     <div className="flex flex-col h-full p-8 overflow-y-auto">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="mx-auto w-full max-w-3xl space-y-8">
         <h2 className="text-3xl font-bold text-foreground">Why Hire Yasser at Eve?</h2>
-        
-        <div className="space-y-4 text-muted-foreground">
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Production AI Systems Expert</h3>
-            <p><strong>Shipped real production ML systems</strong> with high uptime and real users. Built Kaiser&apos;s CFO-endorsed multi-agent Data Analyst system—<strong>critical for team funding</strong>. Designed ReAct-driven SQL agent with parallel sub-agents achieving ~80% faster analysis on live financial data.</p>
-          </div>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Advanced Agentic Architecture</h3>
-            <p>Deep expertise in <strong>multi-agent orchestration and reasoning systems</strong>. Implemented planner-based architectures that decompose complex tasks into manageable steps. Built consensus patterns, self-check mechanisms, and routing logic for reliable AI decision-making across legal and financial domains.</p>
-          </div>
+        {/* 1) Role fit vs. JD (at‑a‑glance) */}
+        <Card title="Role Fit vs. Job Description (At‑a‑Glance)">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li><strong>Develop AI‑Powered Solutions:</strong> Built a production, CFO‑endorsed multi‑agent <em>Data Analyst</em> used by real stakeholders; NLQ → SQL on live financial data; added web‑research + long‑doc analysis.</li>
+            <li><strong>Optimize & Integrate Models:</strong> Hands‑on with OpenAI Agents SDK, retrieval‑augmented generation, prompt/program synthesis, and latency/throughput tuning via parallel sub‑agents.</li>
+            <li><strong>Advance AI Reasoning:</strong> Planner‑based orchestration with self‑check and consensus patterns (parallel agents + adjudicator) to reduce errors and improve reliability.</li>
+            <li><strong>Collaboration:</strong> Partnered with product and finance SMEs/CFOs to turn domain needs into shipped features; comfortable pairing with attorneys to capture legal workflows.</li>
+            <li><strong>Evaluation Frameworks:</strong> Built harnesses to track disagreement %, missing‑citation %, turnaround time; regression suites for prompts/tools; own data curation → eval → deploy loop.</li>
+          </ul>
+        </Card>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Data Scientist Background</h3>
-            <p><strong>Data Scientist at Kaiser Permanente</strong> (Finance team). Experience with large-scale data analysis, building evidence-based reports, and translating domain expertise into technical requirements. Strong analytical skills for measuring AI performance and establishing evaluation frameworks.</p>
-          </div>
+        {/* 2) Quick impact highlights */}
+        <Card title="Quick Impact Highlights">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li>ReAct‑driven SQL agent + parallelism → ~<strong>80% faster</strong> analysis (<strong>~5 min → &lt;1 min</strong> per report).</li>
+            <li><strong>Sole/lead engineer</strong> for ~4 months from concept → pilot → demo; high uptime with real users.</li>
+            <li><strong>1st place</strong> in internal ML competition (chest X‑ray anomaly classifier via transfer learning).</li>
+            <li>Shipped end‑to‑end: orchestration, evaluation, backend (FastAPI/Python), frontend (Next.js/TS), and cloud (Vercel/GCP).</li>
+          </ul>
+        </Card>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Model Integration & Optimization</h3>
-            <p>Proficient with <strong>OpenAI Agents SDK, LangChain, RAG, and fine-tuning</strong>. Experience optimizing models on domain-specific data, integrating multiple models into cohesive systems, and building robust evaluation pipelines. Familiar with prompt engineering and model selection for production use cases.</p>
-          </div>
+        {/* 3) Production AI systems */}
+        <Card title="Production AI Systems (Reliable & Safe)">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li><strong>Citations‑first</strong> outputs with retrieval guards; degrade safely when sources are insufficient.</li>
+            <li>Human‑in‑the‑loop gates on low confidence; observability (metrics, logs) for tight feedback loops.</li>
+            <li>Latency‑aware designs (parallel tools, streaming) and fault‑tolerant retries.</li>
+            <li>Privacy‑minded patterns; zero‑retention calls where needed.</li>
+          </ul>
+        </Card>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Full-Stack AI Product Development</h3>
-            <p><strong>End-to-end ownership:</strong> FastAPI/Python backends, Next.js/React/TypeScript frontends, cloud deployment (AWS/GCP/Vercel). Ships complete features from spec → prototype → production. Built <strong>Career Titan</strong> (careertitan.co) solo—multi-agent career assistant with job search and resume generation.</p>
-          </div>
+        {/* 4) Agentic architecture */}
+        <Card title="Agentic Architecture (Reasoning at Scale)">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li>Planner decomposes problems; tools: SQL, retrieval, drafting, web research.</li>
+            <li>Consensus + adjudicator pass to reconcile divergent answers; highlight uncertainty.</li>
+            <li>Routing by jurisdiction/context (legal) or data system (finance); guardrails for out‑of‑scope queries.</li>
+            <li>Metrics: disagreement %, missing‑citation %, turnaround time, error budgets.</li>
+          </ul>
+        </Card>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Notable AI Projects</h3>
-            <ul className="list-disc list-inside space-y-2 ml-2">
-              <li><strong>Kaiser Data Analyst Agent:</strong> Multi-agent system (orchestrator + parallel coding agents + reporter) processing natural language queries on financial data. <strong>Impressed CFOs</strong> as most innovative project on Data Science team.</li>
-              <li><strong>Career Titan:</strong> AI career coach with multi-agent routing, job-matching recommender with % fit scores, third-party API integration.</li>
-              <li><strong>Web Research Agent:</strong> Added to Kaiser system for pulling latest info and analyzing long documents with current context.</li>
-            </ul>
-          </div>
+        {/* 5) Projects & proof */}
+        <Card title="Projects & Proof">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li><strong>Kaiser Data Analyst Agent:</strong> Orchestrator + parallel code agents + reporter; impressed CFOs and tied to team funding. Built a curated <strong>evaluation dataset</strong> of representative data problems to systematically measure error rates, then used it to A/B test different models (GPT, Claude, Gemini, etc) and iterate on prompts—reducing failures and improving code quality with each sprint.</li>
+            <li><strong>Web Research Agent:</strong> Long‑document analysis with current context to enrich decisions.</li>
+          </ul>
+        </Card>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Technical Foundation</h3>
-            <p><strong>Applied Mathematics (UCSB).</strong> Skilled in PyTorch, TensorFlow, scikit-learn, NumPy/SciPy. Experience with ML concepts (CNNs/transfer learning), evaluation frameworks, and statistical analysis.</p>
-          </div>
-
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Perfect Fit for Eve</h3>
-            <p><strong>AI-native mindset:</strong> Understands how to translate domain expertise (legal/finance) into AI solutions. Fast iteration from ambiguous problems to measurable results. Proven ability to work with domain experts and ship user-facing AI features that drive real business value.</p>
-          </div>
-        </div>
+        {/* 6) Technical foundation & why Eve */}
+        <Card title="Technical Foundation & Why Eve">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li><strong>Applied Mathematics (UCSB):</strong> strong stats/optimization; PyTorch, TensorFlow, scikit‑learn, NumPy/SciPy.</li>
+            <li><strong>Stack:</strong> FastAPI/Python, Next.js/React/TypeScript, OpenAI APIs/Agents, RAG, CI/CD on Vercel/GCP.</li>
+            <li><strong>Mission fit:</strong> Eve’s vision of AI‑native plaintiff firms aligns with my plaintiff‑side intake + case‑scoring wedge; ready to partner with attorneys and ship court‑safe, end‑to‑end features.</li>
+          </ul>
+        </Card>
       </div>
     </div>
   );
 }
 
-// Eve Ideas Panel Component
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="bg-muted/50 rounded-lg p-6 space-y-3"
+    >
+      <h3 className="text-xl font-semibold text-foreground">{title}</h3>
+      {children}
+    </motion.div>
+  );
+}
+
 function EveIdeasPanel() {
   return (
     <div className="flex flex-col h-full p-8 overflow-y-auto">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h2 className="text-3xl font-bold text-foreground">Ideas to Make Eve Dominate</h2>
-        
-        <div className="space-y-4 text-muted-foreground">
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Expand to Potential Plaintiffs</h3>
-            <p>Build consumer-facing pre-intake to capture leads before they reach competitors:</p>
-            <ul className="list-disc list-inside space-y-2 ml-2">
-              <li>Pre-screen claims; score strength; flag SOL/notice rules with citations</li>
-              <li>Auto-draft polished intake letters from user facts</li>
-              <li>Firms that pay a premium could also get advertisement here, thus incentivising them to use the Eve platform</li>
-            </ul>
-          </div>
+      <div className="mx-auto w-full max-w-3xl space-y-8">
+        <h2 className="text-3xl font-bold text-foreground">How Eve Will Dominate</h2>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Premium Placement Model</h3>
-            <p>Create transparent lead-gen channel: Offer firms <strong>&ldquo;Premium Placement&rdquo;</strong> (clearly labeled &ldquo;Sponsored&rdquo;) that prioritizes their listing within jurisdiction/practice-area fit—balancing revenue with user trust.</p>
-          </div>
+        {/* 1) Market size & context */}
+        <IdeaCard title="Market Size (Why Now)">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li><strong>Legal tech spend:</strong> ≈ <strong>$27–32B</strong>, growing high single digits; overall legal services are ≈ <strong>$1T+</strong>.</li>
+            <li><strong>Where adoption starts:</strong> Research/drafting, intake & triage, and eDiscovery/CLM are the fastest-moving GenAI entry points.</li>
+            <li><strong>Eve’s focus:</strong> Win the first touch with claimants, then expand into firm workflows.</li>
+          </ul>
+        </IdeaCard>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Reduce Hallucinations</h3>
-            <ul className="list-disc list-inside space-y-2 ml-2">
-              <li><strong>Citations by default:</strong> Every legal proposition must have a source</li>
-              <li><strong>Parallel consensus:</strong> Run multiple sub-agents; compare outputs. Converge → confidence; diverge → queue in humain in the loop.</li>
-              <li><strong>Adjudicator pass:</strong> Final reviewer checks claims vs. citations</li>
-              <li><strong>RAG + retrieval guards:</strong> Restrict answers to retrieved, jurisdiction-matched passages</li>
-              <li><strong>Evaluation & logs:</strong> Track disagreement rate, missing-citation rate</li>
-            </ul>
-          </div>
+        {/* 2) Plaintiff wedge */}
+        <IdeaCard title="Plaintiff-Side Intake & Case Score (Your Wedge)">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li>Turn a user’s story into a structured <em>case portfolio</em>: <strong>Strength (0–100)</strong>, <strong>deadline window (SOL)</strong>, <strong>top gaps</strong>, and <strong>venue fit</strong>.</li>
+            <li>Ask missing questions so law-firm time is <strong>well-spent</strong>; output a clean, lawyer-ready report.</li>
+            <li>Route to best-fit firms by jurisdiction/practice. If a firm takes the case, <strong>Eve earns a commission</strong>; optional, clearly labeled <em>Premium Placement</em> for visibility.</li>
+            <li>Result: aligned incentives and Eve becomes the default first stop for claimants.</li>
+          </ul>
+        </IdeaCard>
 
+        {/* 3) Trust by design */}
+        <IdeaCard title="Trust by Design (Court-Safe)">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li><strong>Citations by default:</strong> Every legal point links to a source; answers stay within the correct jurisdiction.</li>
+            <li><strong>Safety net:</strong> Low-confidence answers get flagged for human review; auto AI-use disclosures where required.</li>
+            <li><strong>Simple quality metrics:</strong> citation coverage, error catch-rate, turnaround time.</li>
+          </ul>
+        </IdeaCard>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">Multi-Intake Ranking</h3>
-            <p>When given multiple intake emails/PDFs:</p>
-            <ul className="list-disc list-inside space-y-2 ml-2">
-              <li>Extract structured fields automatically</li>
-              <li>Score each case (Strength 0-100, SOL risk, Top 3 Risks)</li>
-              <li>Produce ranking table with Evidence Highlights</li>
-              <li>Generate drafts for top cases, have automatic report ready for lawyers</li>
-            </ul>
-          </div>
+        {/* 4) Intake → Drafts leverage */}
+        <IdeaCard title="From Intake to Drafts—Fast">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li>Auto-extract from emails/PDFs; rank multiple intakes; show <em>why</em> a case scored high/low.</li>
+            <li>One-click drafts: demand letter, chronology, discovery requests; fewer back-and-forths.</li>
+            <li><strong>KPIs:</strong> time-to-first-draft ↓, signed-case conversion ↑.</li>
+          </ul>
+        </IdeaCard>
 
-          <div className="bg-muted/50 rounded-lg p-6 space-y-3">
-            <h3 className="text-xl font-semibold text-foreground">UX for Trust</h3>
-            <ul className="list-disc list-inside space-y-2 ml-2">
-              <li>Surface uncertainty explicitly; avoid overclaiming</li>
-              <li>Show citation sources inline</li>
-              <li>Provide checklists and structured outputs</li>
-              <li>Human-in-the-loop for low-confidence answers</li>
-              <li>&ldquo;Explain-your-answer&rdquo; mode for transparency</li>
-            </ul>
-          </div>
-        </div>
+        {/* 5) Marketplace & incentives */}
+        <IdeaCard title="Clear Marketplace & Aligned Incentives">
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li>Firms ranked by fit and performance; <em>Sponsored</em> spots are obvious and limited.</li>
+            <li><strong>Revenue:</strong> commission on signed matters + premium placement; transparent and predictable.</li>
+            <li>As users start with Eve, partnering becomes a competitive necessity for firms.</li>
+          </ul>
+        </IdeaCard>
       </div>
     </div>
+  );
+}
+
+// Rename this helper for EveIdeasPanel so it doesn't collide with the other one
+function IdeaCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="bg-muted/50 rounded-lg p-6 space-y-3"
+    >
+      <h3 className="text-xl font-semibold text-foreground">{title}</h3>
+      {children}
+    </motion.div>
   );
 }
 
@@ -243,7 +278,7 @@ export function Chat() {
                       className="px-3 py-1.5 text-sm font-semibold"
                       onClick={handleEveIdeas}
                     >
-                      Ideas to make Eve dominate
+                      How Eve will dominate
                     </Button>
                   </motion.div>
                 </div>
