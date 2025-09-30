@@ -83,6 +83,20 @@
     display: none; /* Chrome, Safari, Opera */
 }
 
+/* Handle long URLs and text overflow in messages */
+.prose a,
+.prose code,
+.prose pre {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.prose {
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
 .skeleton {
     * {
         pointer-events: none !important;

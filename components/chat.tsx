@@ -306,9 +306,9 @@ export function Chat() {
                           handleSubmit();
                         }, 100);
                       }}
-                      className="w-full h-auto justify-start items-start text-left border border-border/40 rounded-xl px-4 py-3 hover:bg-accent/50 hover:border-border transition-all"
+                      className="w-full h-auto justify-start items-start text-left border border-border/40 rounded-xl px-4 py-3 hover:bg-accent/50 hover:border-border transition-all whitespace-normal"
                     >
-                      <span className="text-sm text-foreground/80 font-normal">
+                      <span className="text-sm text-foreground/80 font-normal break-words">
                         {prompt.title}
                       </span>
                     </Button>
