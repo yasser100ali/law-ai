@@ -1,8 +1,14 @@
 import "./globals.css";
 import { GeistSans } from "geist/font/sans";
+import { Space_Grotesk } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/navbar";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
 
 export const metadata = {
   title: "Project for Eve AI :)",
@@ -33,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <head></head>
-      <body className={cn(GeistSans.className, "antialiased dark h-full overflow-hidden")}>
+      <body className={cn(GeistSans.className, spaceGrotesk.variable, "antialiased dark h-full overflow-hidden")}>
         <Toaster position="top-center" richColors />
         <div className="flex flex-col h-full">
           <Navbar />

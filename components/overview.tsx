@@ -9,44 +9,62 @@ interface OverviewProps {
 
 export const Overview = ({ onWhyHireMe, onEveIdeas }: OverviewProps) => {
   return (
-    <motion.div
-      key="overview"
-      className="w-full mx-auto max-w-3xl px-10 md:mt-24"
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.98 }}
-      transition={{ delay: 0.5 }}
-    >
-      <div className="flex flex-col gap-4 leading-relaxed text-left">
-        <div className="flex flex-col gap-2">
-          <p className="text-white font-medium text-3xl tracking-tight">
-            Project Dedicated to the Eve AI team
-          </p>
-          <p className="text-muted-foreground font-normal text-xl tracking-tight">
-            by Yasser Ali
-          </p>
-        </div>
+    <div className="w-full h-full flex items-center justify-center px-6 relative overflow-hidden">
+      {/* Subtle grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_60%,transparent_100%)]" />
+      
+      {/* Minimal accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            size="lg"
-            variant="outline"
-            className="px-6 py-3 font-semibold"
-            onClick={onWhyHireMe}
-          >
-            Why hire me?
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="px-6 py-3 font-semibold"
-            onClick={onEveIdeas}
-          >
-            How Eve will dominate.
-          </Button>
+      <motion.div
+        key="overview"
+        className="w-full mx-auto max-w-5xl relative z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="flex flex-col items-center gap-10 text-center">
+          {/* Title */}
+          <div className="flex flex-col gap-4">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight font-space-grotesk text-white leading-[1.1]">
+              Project Dedicated to the
+              <br />
+              <span className="text-white/90">Eve AI Team</span>
+            </h1>
+            <p className="text-muted-foreground text-xl md:text-2xl font-light font-space-grotesk tracking-wide">
+              by <span className="text-white font-normal">Yasser Ali</span>
+            </p>
+          </div>
+
+          {/* Divider line */}
+          <div className="w-24 h-px bg-white/20" />
+
+          {/* Tagline */}
+          <p className="text-muted-foreground text-base md:text-lg max-w-2xl leading-relaxed font-space-grotesk tracking-wide">
+            Production-grade multi-agent AI systems for legal tech
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              onClick={onWhyHireMe}
+            >
+              Why hire me?
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              onClick={onEveIdeas}
+            >
+              Eve Path To Market Domination
+            </Button>
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
