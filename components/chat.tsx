@@ -23,7 +23,7 @@ function WhyHireMePanel() {
         {/* 1) Role fit vs. JD (at‑a‑glance) */}
         <Card title="Role Fit vs. Job Description (At‑a‑Glance)">
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-            <li><strong>Develop AI‑Powered Solutions:</strong> Built an advanced, CFO‑endorsed multi‑agent <em>Data Analyst</em> used by real stakeholders; NLQ → SQL on live financial data; added web‑research + long‑doc analysis.</li>
+            <li><strong>Develop AI‑Powered Solutions:</strong> Built an , CFO‑endorsed multi‑agent <em>Data Analyst</em> used by real stakeholders; NLQ → Python & SQL Agents on live financial data; added web‑research + long‑doc analysis.</li>
             <li><strong>Optimize & Integrate Models:</strong> Hands‑on with OpenAI Agents SDK, retrieval‑augmented generation, prompt/program synthesis, and latency/throughput tuning via parallel sub‑agents.</li>
             <li><strong>Advance AI Reasoning:</strong> Planner‑based orchestration with self‑check and consensus patterns (parallel agents + adjudicator) to reduce errors and improve reliability.</li>
             <li><strong>Collaboration:</strong> Partnered with product and finance SMEs/CFOs to turn domain needs into shipped features; comfortable pairing with attorneys to capture legal workflows.</li>
