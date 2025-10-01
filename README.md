@@ -1,41 +1,125 @@
-# AI SDK Python Streaming Preview
+# Law AI Assistant 🤖⚖️
 
-This template demonstrates the usage of [Data Stream Protocol](https://sdk.vercel.ai/docs/ai-sdk-ui/stream-protocol#data-stream-protocol) to stream chat completions from a Python endpoint ([FastAPI](https://fastapi.tiangolo.com)) and display them using the [useChat](https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot#chatbot) hook in your Next.js application.
+An advanced AI-powered legal assistant platform featuring dual-agent architecture, document analysis via RAG (Retrieval-Augmented Generation), and real-time chat streaming. Built for both legal professionals and individuals seeking legal guidance.
 
-## Deploy your own
+## ✨ Features
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel-labs%2Fai-sdk-preview-python-streaming&env=OPENAI_API_KEY&envDescription=API%20keys%20needed%20for%20application&envLink=https%3A%2F%2Fgithub.com%2Fvercel-labs%2Fai-sdk-preview-python-streaming%2Fblob%2Fmain%2F.env.example)
+### 🤖 Dual-Agent System
+- **Lawyer Agent**: Provides professional legal analysis and advice
+- **Plaintiff Agent**: Advocates from the client's perspective
+- Intelligent agent selection based on conversation context
 
-## How to use
+### 📄 Document Processing & RAG
+- **Vector Store Integration**: Powered by OpenAI's vector stores API
+- **Document Upload**: Support for PDF, text, and other document formats
+- **Semantic Search**: Intelligent retrieval of relevant document sections
+- **Context Injection**: Automatically includes relevant document context in responses
 
-Run [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+### 💬 Real-Time Chat
+- **Streaming Responses**: Real-time token streaming for smooth UX
+- **File Attachments**: Upload and reference documents in conversations
+- **Chat History**: Persistent conversation management per chat session
 
+### 🛠️ Technical Stack
+- **Frontend**: Next.js 13+ with TypeScript, Tailwind CSS
+- **Backend**: FastAPI with Python agents framework
+- **AI**: OpenAI GPT models with vector store integration
+- **Deployment**: Vercel-ready with environment-based configuration
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- OpenAI API key
+
+### Installation
+
+1. **Clone the repository**
 ```bash
-npx create-next-app --example https://github.com/vercel-labs/ai-sdk-preview-python-streaming ai-sdk-preview-python-streaming-example
+git clone https://github.com/yasser100ali/law-ai.git
+cd law-ai
 ```
 
+2. **Install dependencies**
 ```bash
-yarn create next-app --example https://github.com/vercel-labs/ai-sdk-preview-python-streaming ai-sdk-preview-python-streaming-example
+# Frontend dependencies
+npm install
+# or
+pnpm install
+
+# Python dependencies
+pip install -r requirements.txt
 ```
 
+3. **Environment Setup**
 ```bash
-pnpm create next-app --example https://github.com/vercel-labs/ai-sdk-preview-python-streaming ai-sdk-preview-python-streaming-example
+# Copy environment template
+cp .env.example .env.local
+
+# Edit .env.local and add your OpenAI API key
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-To run the example locally you need to:
+4. **Run locally**
+```bash
+# Terminal 1: Start FastAPI backend
+uvicorn api.index:app --host 0.0.0.0 --port 8000 --reload
 
-1. Sign up for accounts with the AI providers you want to use (e.g., OpenAI, Anthropic).
-2. Obtain API keys for each provider.
-3. Set the required environment variables as shown in the `.env.example` file, but in a new file called `.env`.
-4. `pnpm install` to install the required Node dependencies.
-5. `virtualenv venv` to create a virtual environment.
-6. `source venv/bin/activate` to activate the virtual environment.
-7. `pip install -r requirements.txt` to install the required Python dependencies.
-8. `pnpm dev` to launch the development server.
+# Terminal 2: Start Next.js frontend
+npm run dev
+```
 
-## Learn More
+5. **Open your browser**
+Navigate to `http://localhost:3000`
 
-To learn more about the AI SDK or Next.js by Vercel, take a look at the following resources:
+## 🏗️ Architecture
 
-- [AI SDK Documentation](https://sdk.vercel.ai/docs)
-- [Next.js Documentation](https://nextjs.org/docs)
+### System Components
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Next.js UI    │───▶│   FastAPI API    │───▶│   OpenAI API    │
+│   (Frontend)    │    │   (Backend)      │    │   (AI Models)   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│  Chat Interface │    │   Dual Agents    │    │ Vector Stores   │
+│  File Upload    │    │   Lawyer/Plaintiff│    │ Document RAG    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### Data Flow
+1. **User Input** → Chat interface captures message + attachments
+2. **Document Processing** → Files uploaded to vector store via RAG system
+3. **Agent Selection** → Orchestrator chooses appropriate agent (lawyer/plaintiff)
+4. **Context Enhancement** → Semantic search retrieves relevant document sections
+5. **AI Generation** → Enhanced prompt sent to OpenAI with full context
+6. **Streaming Response** → Real-time response streamed back to user
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create `.env.local` with:
+
+```bash
+# Required
+OPENAI_API_KEY=your_openai_api_key_here
+BLOB_READ_WRITE_TOKEN => make blob and get token, this uses vercel
+# Optional (defaults shown)
+```
+
+
+
+
+
+## 🙋‍♂️ Support
+
+For questions, issues, or feature requests, please open an issue on GitHub or contact the maintainer.
+
+---
+
+*Built with ❤️ by [Yasser Ali](https://github.com/yasser100ali) - Empowering legal accessibility through AI*
