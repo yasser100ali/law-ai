@@ -123,7 +123,11 @@ def process_file_content(content: str) -> str:
     url_file_pattern = r'\[File: ([^(]+) \(([^)]+)\) - URL: ([^\]]+)\]'
     
     # Pattern for base64 content: [File: filename (mediaType) - Content: base64data]
-    content_file_pattern = r'\[File: ([^(]+) \(([^)]+)\) - Content: ([^\]]+)\]'
+
+    content_file_pattern = re.compile(
+        r'\[File:\s*(.+?)\s*\(([^)]+)\)\s*-\s*Content:\s*(.+?)\]',
+        flags=re.DOTALL
+    )    
     
     def replace_url_file_ref(match):
         filename = match.group(1).strip()

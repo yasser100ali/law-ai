@@ -14,14 +14,13 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
+import { upload } from "@vercel/blob/client";
 
 import { cn, sanitizeUIMessages } from "@/lib/utils";
 
 import { ArrowUpIcon, StopIcon } from "./icons";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-
-
 
 export function MultimodalInput({
   chatId,
@@ -83,20 +82,15 @@ export function MultimodalInput({
     }
   };
 
-  const [localStorageInput, setLocalStorageInput] = useLocalStorage(
-    "input",
-    "",
-  );
+  const [localStorageInput, setLocalStorageInput] = useLocalStorage("input", "");
 
   useEffect(() => {
     if (textareaRef.current) {
       const domValue = textareaRef.current.value;
-      // Prefer DOM value over localStorage to handle hydration
       const finalValue = domValue || localStorageInput || "";
       setInput(finalValue);
       adjustHeight();
     }
-    // Only run once after hydration
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -104,10 +98,8 @@ export function MultimodalInput({
     setLocalStorageInput(input);
   }, [input, setLocalStorageInput]);
 
-  // Ensure the textarea shrinks back after external value changes (e.g., clearing on submit)
   useEffect(() => {
     if (textareaRef.current) {
-      // reset to auto first to allow shrink
       textareaRef.current.style.height = "auto";
     }
     adjustHeight();
@@ -118,51 +110,55 @@ export function MultimodalInput({
     adjustHeight();
   };
 
+  const SUPPORTED = [
+    "application/pdf",
+    "text/csv",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/plain",
+  ] as const;
+
+  const isSupported = (file: File) =>
+    SUPPORTED.includes(file.type as any) ||
+    file.name.toLowerCase().endsWith(".csv") ||
+    file.name.toLowerCase().endsWith(".xlsx") ||
+    file.name.toLowerCase().endsWith(".xls");
+
+  const withinSize = (file: File) => {
+    const max = file.type.includes("pdf") ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    return file.size <= max;
+  };
+
+  const filterValid = (files: FileList | File[]) =>
+    Array.from(files).filter((file) => {
+      const okType = isSupported(file);
+      if (!okType) {
+        toast.error(
+          `${file.name}: Unsupported file type. Please upload PDF, CSV, Excel (.xlsx, .xls), or text files.`,
+        );
+      }
+      const okSize = withinSize(file);
+      if (!okSize) {
+        const max =
+          file.type.includes("pdf") ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+        toast.error(
+          `${file.name}: File too large. Maximum size is ${max / (1024 * 1024)}MB.`,
+        );
+      }
+      return okType && okSize;
+    });
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      // Filter for supported file types
-      const supportedTypes = [
-        'application/pdf',
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain'
-      ];
-
-      const validFiles = Array.from(files).filter(file => {
-        const isValidType = supportedTypes.includes(file.type) ||
-          file.name.toLowerCase().endsWith('.csv') ||
-          file.name.toLowerCase().endsWith('.xlsx') ||
-          file.name.toLowerCase().endsWith('.xls');
-
-        if (!isValidType) {
-          toast.error(`${file.name}: Unsupported file type. Please upload PDF, CSV, Excel (.xlsx, .xls), or text files.`);
-        }
-
-        // Check file size (limit to 10MB for data files)
-        const maxSize = file.type.includes('pdf') ? 50 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB for PDFs, 10MB for others
-        if (file.size > maxSize) {
-          toast.error(`${file.name}: File too large. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
-          return false;
-        }
-
-        return isValidType;
-      });
-
-      setAttachments((prev) => [...prev, ...validFiles]);
-    }
+    if (files) setAttachments((prev) => [...prev, ...filterValid(files)]);
   };
 
-  const handleAttachClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleAttachClick = () => fileInputRef.current?.click();
 
   const removeAttachment = (indexToRemove: number) => {
-    setAttachments((prev) => prev.filter((_, index) => index !== indexToRemove));
+    setAttachments((prev) => prev.filter((_, i) => i !== indexToRemove));
   };
 
-  // Prevent default behavior on attachment removal
   const handleRemoveAttachment = (e: React.MouseEvent, indexToRemove: number) => {
     e.preventDefault();
     e.stopPropagation();
@@ -172,16 +168,12 @@ export function MultimodalInput({
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    // Only set drag over if dragging files
-    if (e.dataTransfer?.types.includes('Files')) {
-      setIsDragOver(true);
-    }
+    if (e.dataTransfer?.types.includes("Files")) setIsDragOver(true);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    // Use setTimeout to prevent flickering when moving between child elements
     setTimeout(() => {
       if (!e.currentTarget.contains(e.relatedTarget as Node)) {
         setIsDragOver(false);
@@ -202,45 +194,16 @@ export function MultimodalInput({
     setDragCounter(0);
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
-      // Filter for supported file types
-      const supportedTypes = [
-        'application/pdf',
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain'
-      ];
-
-      const validFiles = Array.from(files).filter(file => {
-        const isValidType = supportedTypes.includes(file.type) ||
-          file.name.toLowerCase().endsWith('.csv') ||
-          file.name.toLowerCase().endsWith('.xlsx') ||
-          file.name.toLowerCase().endsWith('.xls');
-
-        if (!isValidType) {
-          toast.error(`${file.name}: Unsupported file type. Please upload PDF, CSV, Excel (.xlsx, .xls), or text files.`);
-        }
-
-        // Check file size (limit to 10MB for data files)
-        const maxSize = file.type.includes('pdf') ? 50 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB for PDFs, 10MB for others
-        if (file.size > maxSize) {
-          toast.error(`${file.name}: File too large. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
-          return false;
-        }
-
-        return isValidType;
-      });
-
-      setAttachments((prev) => [...prev, ...validFiles]);
+      setAttachments((prev) => [...prev, ...filterValid(files)]);
     }
   };
 
-  // Enable dropping files anywhere on the page
+  // page-level drop overlay
   useEffect(() => {
     const onWindowDragEnter = (e: DragEvent) => {
       e.preventDefault();
       setDragCounter((prev) => prev + 1);
-      if (e.dataTransfer?.types.includes('Files')) {
+      if (e.dataTransfer?.types.includes("Files")) {
         setIsPageDragOver(true);
         wasPageDragOverRef.current = true;
       }
@@ -252,53 +215,22 @@ export function MultimodalInput({
       e.preventDefault();
       setDragCounter(0);
       setIsPageDragOver(false);
-      // Only handle drops when page overlay is active (dropping in empty space)
-      // Local component drops are handled by the component's own drop handler
       const files = e.dataTransfer?.files;
       if (files && files.length > 0 && wasPageDragOverRef.current) {
-        // Filter for supported file types
-        const supportedTypes = [
-          'application/pdf',
-          'text/csv',
-          'application/vnd.ms-excel',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'text/plain'
-        ];
-
-        const validFiles = Array.from(files).filter(file => {
-          const isValidType = supportedTypes.includes(file.type) ||
-            file.name.toLowerCase().endsWith('.csv') ||
-            file.name.toLowerCase().endsWith('.xlsx') ||
-            file.name.toLowerCase().endsWith('.xls');
-
-          if (!isValidType) {
-            toast.error(`${file.name}: Unsupported file type. Please upload PDF, CSV, Excel (.xlsx, .xls), or text files.`);
-          }
-
-          // Check file size (limit to 10MB for data files)
-          const maxSize = file.type.includes('pdf') ? 50 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB for PDFs, 10MB for others
-          if (file.size > maxSize) {
-            toast.error(`${file.name}: File too large. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
-            return false;
-          }
-
-          return isValidType;
-        });
-
-        setAttachments((prev) => [...prev, ...validFiles]);
+        setAttachments((prev) => [...prev, ...filterValid(files)]);
       }
       wasPageDragOverRef.current = false;
     };
     const onWindowDragLeave = (e: DragEvent) => {
       e.preventDefault();
       setDragCounter((prev) => {
-        const newCounter = prev - 1;
-        if (newCounter <= 0) {
+        const n = prev - 1;
+        if (n <= 0) {
           setIsPageDragOver(false);
           wasPageDragOverRef.current = false;
           return 0;
         }
-        return newCounter;
+        return n;
       });
     };
 
@@ -306,7 +238,6 @@ export function MultimodalInput({
     window.addEventListener("dragover", onWindowDragOver);
     window.addEventListener("drop", onWindowDrop);
     window.addEventListener("dragleave", onWindowDragLeave);
-
     return () => {
       window.removeEventListener("dragenter", onWindowDragEnter);
       window.removeEventListener("dragover", onWindowDragOver);
@@ -315,59 +246,58 @@ export function MultimodalInput({
     };
   }, []);
 
+  // === NEW: Blob upload on submit ===
   const submitForm = useCallback(() => {
-    const fileToDataUrl = (file: File): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    };
-
     const processSubmit = async () => {
-      const attachmentData = await Promise.all(
-        attachments.map(async (file) => ({
-          name: file.name,
-          type: file.type,
-          content: await fileToDataUrl(file),
-        })),
-      );
+      // Early exit: nothing to send
+      if (!input.trim() && attachments.length === 0) return;
 
+      // Upload each file to Vercel Blob (client-side)
+      let uploaded: Array<{ name: string; type: string; url: string }> = [];
+      if (attachments.length > 0) {
+        try {
+          uploaded = await Promise.all(
+            attachments.map(async (file) => {
+              const res = await upload(file.name, file, {
+                access: "public", // or "private" + signed reads
+                handleUploadUrl: "/api/blob/upload", // your route that calls handleUpload()
+              });
+              return { name: file.name, type: file.type, url: res.url };
+            }),
+          );
+        } catch (err) {
+          console.error(err);
+          toast.error("One or more uploads failed.");
+          return;
+        }
+      }
+
+      // Send tiny payload to your backend (no base64)
       handleSubmit(undefined, {
-        data: {
-          attachments: attachmentData,
-        },
+        data: { attachments: uploaded },
       });
 
-      // Clear attachments so they don't appear on the next prompt
+      // Reset UI
       setAttachments([]);
       if (fileInputRef.current) {
         try {
-          // reset the native input so selecting the same file again re-triggers onChange
           fileInputRef.current.value = "";
         } catch {}
       }
-
       setLocalStorageInput("");
       resetHeight();
-
-      if (width && width > 768) {
-        textareaRef.current?.focus();
-      }
+      if (width && width > 768) textareaRef.current?.focus();
     };
 
     processSubmit();
-  }, [handleSubmit, setLocalStorageInput, width, attachments]);
+  }, [attachments, handleSubmit, input, setLocalStorageInput, width]);
 
   return (
     <div className="relative w-full flex flex-col gap-2">
       {isPageDragOver && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm"
-          onDragOver={(e) => {
-            e.preventDefault();
-          }}
+          onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
             e.preventDefault();
             const files = e.dataTransfer.files;
@@ -375,48 +305,19 @@ export function MultimodalInput({
             setDragCounter(0);
             wasPageDragOverRef.current = false;
             if (files && files.length > 0) {
-              // Filter for supported file types
-              const supportedTypes = [
-                'application/pdf',
-                'text/csv',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'text/plain'
-              ];
-
-              const validFiles = Array.from(files).filter(file => {
-                const isValidType = supportedTypes.includes(file.type) ||
-                  file.name.toLowerCase().endsWith('.csv') ||
-                  file.name.toLowerCase().endsWith('.xlsx') ||
-                  file.name.toLowerCase().endsWith('.xls');
-
-                if (!isValidType) {
-                  toast.error(`${file.name}: Unsupported file type. Please upload PDF, CSV, Excel (.xlsx, .xls), or text files.`);
-                }
-
-                // Check file size (limit to 10MB for data files)
-                const maxSize = file.type.includes('pdf') ? 50 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB for PDFs, 10MB for others
-                if (file.size > maxSize) {
-                  toast.error(`${file.name}: File too large. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
-                  return false;
-                }
-
-                return isValidType;
-              });
-
-              setAttachments((prev) => [...prev, ...validFiles]);
+              setAttachments((prev) => [...prev, ...filterValid(files)]);
             }
           }}
           onDragLeave={(e) => {
             e.preventDefault();
             setDragCounter((prev) => {
-              const newCounter = prev - 1;
-              if (newCounter <= 0) {
+              const n = prev - 1;
+              if (n <= 0) {
                 setIsPageDragOver(false);
                 wasPageDragOverRef.current = false;
                 return 0;
               }
-              return newCounter;
+              return n;
             });
           }}
         >
@@ -425,6 +326,7 @@ export function MultimodalInput({
           </div>
         </div>
       )}
+
       {attachments.length > 0 && (
         <div className="flex gap-2 flex-wrap">
           {attachments.map((file, index) => (
@@ -447,8 +349,6 @@ export function MultimodalInput({
           ))}
         </div>
       )}
-
-
 
       <div
         className={cn(
@@ -475,11 +375,8 @@ export function MultimodalInput({
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-
                 if (isLoading) {
-                  toast.error(
-                    "Please wait for the model to finish its response!",
-                  );
+                  toast.error("Please wait for the model to finish its response!");
                 } else {
                   submitForm();
                 }
@@ -528,6 +425,8 @@ export function MultimodalInput({
           className="hidden"
           onChange={handleFileChange}
           multiple
+          // optional: limit selectable types
+          accept=".pdf,.txt,.csv,.xls,.xlsx,text/plain,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
         />
       </div>
     </div>
