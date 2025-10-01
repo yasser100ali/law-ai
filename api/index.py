@@ -37,25 +37,48 @@ class Request(BaseModel):
 
 
 def _format_messages_for_agent(
-    messages: List[ClientMessage], 
+    messages: List[ClientMessage],
     attachments: Optional[List[Dict[str, str]]] = None
 ) -> List[Dict[str, str]]:
     formatted: List[Dict[str, str]] = []
+
     for i, message in enumerate(messages):
         content = message.content or ""
 
-        # Add attachments to the last user message (most recent)
-        if i == len(messages) - 1 and message.role == "user" and attachments:
-            for attachment in attachments:
-                content += (
-                    f"\n[File: {attachment['name']} ({attachment['type']}) - Content: {attachment['content']}]"
-                )
+        # Debug: Print all messages and their structure
+        print(f"DEBUG: Processing message {i}: role={message.role}, content='{content[:100]}...'")
+        print(f"DEBUG: Message has attachments: {bool(attachments)}")
 
-        if message.experimental_attachments:
+        # Attach extra info to the *last* user message
+        if i == len(messages) - 1 and message.role == "user" and attachments:
+            print(f"DEBUG: Found {len(attachments)} attachments")
+            for j, attachment in enumerate(attachments):
+                print(f"DEBUG: Attachment {j}: {attachment}")
+                if "content" in attachment:
+                    # Inline content (old flow)
+                    content += (
+                        f"\n[File: {attachment['name']} ({attachment['type']}) - Content: {attachment['content']}]"
+                    )
+                    print(f"DEBUG: Added inline content for {attachment['name']}")
+                elif "url" in attachment:
+                    # Blob URL (new flow)
+                    content += (
+                        f"\n[File: {attachment['name']} ({attachment['type']}) - URL: {attachment['url']}]"
+                    )
+                    print(f"DEBUG: Added blob URL for {attachment['name']}: {attachment['url']}")
+                else:
+                    print(f"DEBUG: Attachment {j} has no content or url: {list(attachment.keys())}")
+
+        # Handle experimental_attachments if present
+        if getattr(message, "experimental_attachments", None):
+            print(f"DEBUG: Found experimental_attachments: {message.experimental_attachments}")
             for attachment in message.experimental_attachments:
                 content += (
                     f"\n[File: {attachment.name} ({attachment.contentType}) - URL: {attachment.url}]"
                 )
+                print(f"DEBUG: Added experimental attachment: {attachment.name}")
+
+        print(f"DEBUG: Final content for message {i}: '{content[:200]}...'")
 
         formatted.append({
             "role": message.role,
