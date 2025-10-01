@@ -60,7 +60,7 @@ export const Overview = ({ onWhyHireMe, onEveIdeas }: OverviewProps) => {
               className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onEveIdeas}
             >
-              Eve&apos;s Path To Market Domination
+              How Eve can dominate the Legal AI Market
             </Button>
           </div>
         </div>
