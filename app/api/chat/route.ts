@@ -10,7 +10,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Forward to your Python backend (streaming response)
-    const response = await fetch("http://localhost:8000/api/chat", {
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+    const response = await fetch(`${backendUrl}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
