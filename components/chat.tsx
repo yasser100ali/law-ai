@@ -100,7 +100,7 @@ function EveIdeasPanel() {
   return (
     <div className="flex flex-col h-full p-8 overflow-y-auto">
       <div className="mx-auto w-full max-w-3xl space-y-8">
-        <h2 className="text-3xl font-bold text-foreground">Eve Path To Market Domination</h2>
+        <h2 className="text-3xl font-bold text-foreground">Eve's Path To Market Domination</h2>
 
         {/* 1) Market size & context */}
         <IdeaCard title="Market Size (Why Now)">
@@ -278,7 +278,7 @@ export function Chat() {
                       className="px-3 py-1.5 text-sm font-semibold"
                       onClick={handleEveIdeas}
                     >
-                      Eve Path To Market Domination
+                      Eve's Path To Market Domination
                     </Button>
                   </motion.div>
                 </div>
