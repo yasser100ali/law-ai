@@ -3,7 +3,6 @@ import time
 import logging 
 import os
 import re
-import csv
 import requests
 import base64
 from io import BytesIO, StringIO

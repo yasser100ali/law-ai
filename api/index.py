@@ -8,10 +8,12 @@ from pydantic import BaseModel
 
 from .chat_agents.orchestrator import stream_chat_py
 from .utils.prompt import ClientMessage
-
+from .rag_store import ensure_vector_store, upload_blobs, search_store, format_results_for_prompt
+from openai import OpenAI
 
 load_dotenv(".env")
 
+client = OpenAI()
 
 app = FastAPI()
 
@@ -99,18 +101,45 @@ def _stream_agent_response(
         selected_chat_mode=selected_chat_mode,
     )
 
-
 @app.post("/api/chat")
 async def handle_chat_data(
     request: Request,
     protocol: str = Query("data"),
     chat_mode: str = Query("default"),
 ):
-    # Extract attachments from request data if present
+    # attachments + chatId from the frontend
     attachments = None
-    if request.data and "attachments" in request.data:
-        attachments = request.data["attachments"]
-    
+    chat_id = "default"
+    if request.data:
+        attachments = request.data.get("attachments")
+        chat_id = request.data.get("chatId", "default")
+
+    # 1) RAG ingest (only if new attachments present)
+    vector_store_id = ensure_vector_store(chat_id)
+    if attachments:
+        upload_blobs(vector_store_id, attachments)
+
+    # 2) OPTIONAL: semantic search now, and inject into the last user message
+    # Grab the last user message text
+    last_user_text = ""
+    for m in reversed(request.messages):
+        if m.role == "user":
+            last_user_text = m.content or ""
+            break
+    if last_user_text:
+        search_results = client.vector_stores.search(
+            vector_store_id=vector_store_id,
+            query=last_user_text,
+            rewrite_query=True
+        )
+        retrieved = format_results_for_prompt(search_results)
+        if retrieved:
+            # append a synthetic system/dev note with retrieved snippets
+            # (or append to the last user message—either is fine; I prefer a short system block)
+            request.messages.append(
+                ClientMessage(role="system", content=f"[RETRIEVED CONTEXT]\n{retrieved}")
+            )
+
     async def event_stream() -> AsyncIterator[str]:
         async for chunk in _stream_agent_response(request.messages, chat_mode, attachments):
             yield chunk
