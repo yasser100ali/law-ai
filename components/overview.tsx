@@ -53,6 +53,14 @@ export const Overview = ({ onWhyHireMe, onEveIdeas, onIntake }: OverviewProps) =
               size="lg"
               variant="outline"
               className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              onClick={onIntake}
+            >
+              File an Intake
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onWhyHireMe}
             >
               Why hire me?
@@ -64,14 +72,6 @@ export const Overview = ({ onWhyHireMe, onEveIdeas, onIntake }: OverviewProps) =
               onClick={onEveIdeas}
             >
               How Eve can dominate the Legal AI Market
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
-              onClick={onIntake}
-            >
-              File an intake with Eve
             </Button>
           </div>
         </div>
