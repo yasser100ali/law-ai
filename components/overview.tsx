@@ -33,12 +33,12 @@ export const Overview = ({
         <div className="flex flex-col items-center gap-10 text-center">
           {/* Title */}
           <div className="flex flex-col gap-4">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight font-space-grotesk text-white leading-[1.1]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight font-space-grotesk text-white leading-[1.1]">
               Project Dedicated to the
               <br />
               <span className="text-white/90">Eve AI Team</span>
             </h1>
-            <p className="text-muted-foreground text-xl md:text-2xl font-light font-space-grotesk tracking-wide">
+            <p className="text-muted-foreground text-lg sm:text-xl md:text-2xl font-light font-space-grotesk tracking-wide">
               by <span className="text-white font-normal">Yasser Ali</span>
             </p>
           </div>
@@ -47,7 +47,7 @@ export const Overview = ({
           <div className="w-24 h-px bg-white/20" />
 
           {/* Tagline */}
-          <p className="text-muted-foreground text-base md:text-lg max-w-2xl leading-relaxed font-space-grotesk tracking-wide">
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed font-space-grotesk tracking-wide">
             Production-grade multi-agent AI systems for legal tech
           </p>
 
@@ -56,7 +56,7 @@ export const Overview = ({
             <Button
               size="lg"
               variant="outline"
-              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 text-sm sm:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onWhyHireMe}
             >
               Why hire me?
@@ -64,7 +64,7 @@ export const Overview = ({
             <Button
               size="lg"
               variant="outline"
-              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 text-sm sm:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onEveIdeas}
             >
               How Eve can dominate Legal AI
@@ -72,7 +72,7 @@ export const Overview = ({
             <Button
               size="lg"
               variant="outline"
-              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 text-sm sm:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onIntake}
             >
               File an intake
@@ -80,7 +80,7 @@ export const Overview = ({
             <Button
               size="lg"
               variant="outline"
-              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 text-sm sm:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onOpenIntakes}
             >
               Open intakes

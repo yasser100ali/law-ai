@@ -685,39 +685,39 @@ export function Chat() {
               }}
               className="flex-shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
             >
-              <div className="px-4 py-3">
-                <div className="flex items-center justify-between gap-4 max-w-3xl mx-auto">
+              <div className="px-4 py-4">
+                <div className="flex flex-col gap-3 max-w-4xl mx-auto">
                   <motion.div 
                     className="flex flex-col gap-0.5"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.3 }}
                   >
-                    <p className="text-white font-medium text-lg leading-tight tracking-tight">
+                    <p className="text-white font-medium text-base sm:text-lg leading-tight tracking-tight">
                       Project Dedicated to the Eve AI team
                     </p>
-                    <p className="text-muted-foreground font-normal text-sm tracking-tight">
+                    <p className="text-muted-foreground font-normal text-xs sm:text-sm tracking-tight">
                       by Yasser Ali
                     </p>
                   </motion.div>
                   <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2"
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.3 }}
                   >
                     <Button
                       size="sm"
-                      variant="secondary"
-                      className="w-full px-3 py-1.5 text-sm font-semibold"
+                      variant="outline"
+                      className="w-full h-auto px-3 py-2.5 text-xs sm:text-sm font-semibold whitespace-normal leading-snug"
                       onClick={handleOpenIntakes}
                     >
-                      Open intakes (for lawyers)
+                      Open intakes
                     </Button>
                     <Button
                       size="sm"
-                      variant="default"
-                      className="w-full px-3 py-1.5 text-sm font-semibold"
+                      variant="outline"
+                      className="w-full h-auto px-3 py-2.5 text-xs sm:text-sm font-semibold whitespace-normal leading-snug"
                       onClick={handleIntake}
                     >
                       File an intake
@@ -725,7 +725,7 @@ export function Chat() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full px-3 py-1.5 text-sm font-semibold"
+                      className="w-full h-auto px-3 py-2.5 text-xs sm:text-sm font-semibold whitespace-normal leading-snug"
                       onClick={handleWhyHireMe}
                     >
                       Why hire me?
@@ -733,7 +733,7 @@ export function Chat() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full px-3 py-1.5 text-sm font-semibold"
+                      className="w-full h-auto px-3 py-2.5 text-xs sm:text-sm font-semibold whitespace-normal leading-snug"
                       onClick={handleEveIdeas}
                     >
                       How Eve can dominate Legal AI
