@@ -694,7 +694,7 @@ export function Chat() {
                     transition={{ delay: 0.3, duration: 0.3 }}
                   >
                     <p className="text-white font-medium text-base sm:text-lg leading-tight tracking-tight">
-                      Project Dedicated to the Eve AI team
+                      Atlas AI
                     </p>
                     <p className="text-muted-foreground font-normal text-xs sm:text-sm tracking-tight">
                       by Yasser Ali
@@ -780,7 +780,7 @@ export function Chat() {
           <div className="flex-shrink-0 mx-auto px-4 bg-background pb-4 md:pb-6 w-full md:max-w-3xl">
             {/* Suggested Prompts - only show when no messages */}
             {!hasMessages && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 [@media(max-height:750px)]:hidden">
                 {[
                   { title: "Tell me about Yasser.", action: "Tell me about Yasser" },
                   { title: "How can I use this chatbot?", action: "How can I use this chatbot?" },
