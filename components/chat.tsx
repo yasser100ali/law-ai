@@ -10,8 +10,8 @@ import type { Message } from "ai";
 import { useChat } from "ai/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea"; 
 import { motion } from "framer-motion";
 
 
@@ -168,8 +168,27 @@ function IdeaCard({ title, children }: { title: string; children: React.ReactNod
   );
 }
 
-// NEW 
-function IntakePanel() {
+type IntakeRecord = {
+  id: string;
+  submittedAt: string;
+  shareWithMarketplace: boolean;
+  form: {
+    fullName: string;
+    email: string;
+    phone: string;
+    jurisdiction: string;
+    matterType: string;
+    summary: string;
+    goals: string;
+    urgency: string;
+  };
+};
+
+function IntakePanel({
+  onIntakeSubmitted,
+}: {
+  onIntakeSubmitted: (record: IntakeRecord) => void;
+}) {
   const [formData, setFormData] = React.useState({
     fullName: "",
     email: "",
@@ -205,11 +224,30 @@ function IntakePanel() {
     setTimeout(() => {
       setIsSubmitting(false);
       setHasSubmitted(true);
+      const record: IntakeRecord = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        submittedAt: new Date().toISOString(),
+        shareWithMarketplace,
+        form: { ...formData },
+      };
+      onIntakeSubmitted(record);
       toast.success(
         shareWithMarketplace
           ? "Your intake is ready to share with matched firms."
           : "Your intake has been saved."
       );
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        jurisdiction: "",
+        matterType: "",
+        summary: "",
+        goals: "",
+        urgency: "",
+      });
+      setConsent(false);
+      setShareWithMarketplace(true);
     }, 650);
   };
 
@@ -373,7 +411,176 @@ function IntakePanel() {
   );
 }
 
+function OpenIntakesPanel({
+  records,
+}: {
+  records: IntakeRecord[];
+}) {
+  const [matterFilter, setMatterFilter] = React.useState<string>("All");
 
+  const matterTypes = React.useMemo(() => {
+    const unique = new Set<string>();
+    records.forEach((record) => {
+      const trimmed = record.form.matterType.trim();
+      if (trimmed.length > 0) {
+        unique.add(trimmed);
+      }
+    });
+    return ["All", ...Array.from(unique).sort((a, b) => a.localeCompare(b))];
+  }, [records]);
+
+  const filteredRecords = React.useMemo(() => {
+    if (matterFilter === "All") {
+      return records;
+    }
+
+    return records.filter(
+      (record) => record.form.matterType.trim() === matterFilter,
+    );
+  }, [records, matterFilter]);
+
+  return (
+    <div className="flex flex-col h-full p-8 overflow-y-auto">
+      <div className="mx-auto w-full max-w-4xl space-y-8">
+        <div className="space-y-3">
+          <h2 className="text-3xl font-bold text-foreground">
+            Open Intakes (for lawyers only)
+          </h2>
+          <p className="text-muted-foreground leading-relaxed">
+            Review the latest claimant submissions and filter by matter type to
+            focus on the cases that best match your practice areas.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-4 rounded-lg border border-border/60 bg-background/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Matter type</p>
+            <p className="text-xs text-muted-foreground">
+              Filter intakes by the matter type provided by the claimant.
+            </p>
+          </div>
+          <select
+            value={matterFilter}
+            onChange={(event) => setMatterFilter(event.target.value)}
+            className="w-full sm:w-56 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+          >
+            {matterTypes.map((type) => (
+              <option key={type} value={type}>
+                {type === "All" ? "All matter types" : type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {filteredRecords.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 p-8 text-center">
+            <p className="text-sm font-medium text-foreground">
+              {records.length === 0
+                ? "No intakes have been filed yet."
+                : "No intakes match this matter type filter."}
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Once claimants submit intake forms, they will appear here for
+              review.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredRecords.map((record) => {
+              const submittedDate = new Date(record.submittedAt);
+              const formattedDate = submittedDate.toLocaleString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              });
+
+              return (
+                <motion.div
+                  key={record.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="rounded-lg border border-border/60 bg-background/70 p-6 shadow-sm"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">
+                        {record.form.fullName || "Anonymous claimant"}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {formattedDate}
+                        {record.form.jurisdiction && ` · ${record.form.jurisdiction}`}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      {record.form.matterType && (
+                        <span className="rounded-full border border-border/60 px-3 py-1 text-foreground">
+                          {record.form.matterType}
+                        </span>
+                      )}
+                      <span className="rounded-full border border-border/60 px-3 py-1">
+                        {record.shareWithMarketplace
+                          ? "Opted into marketplace"
+                          : "Private intake"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-3 text-sm text-foreground/90">
+                    <div>
+                      <p className="font-medium text-foreground">Summary</p>
+                      <p className="text-muted-foreground whitespace-pre-line">
+                        {record.form.summary || "No summary provided."}
+                      </p>
+                    </div>
+
+                    {record.form.goals && (
+                      <div>
+                        <p className="font-medium text-foreground">Desired outcome</p>
+                        <p className="text-muted-foreground whitespace-pre-line">
+                          {record.form.goals}
+                        </p>
+                      </div>
+                    )}
+
+                    {record.form.urgency && (
+                      <div>
+                        <p className="font-medium text-foreground">Urgency notes</p>
+                        <p className="text-muted-foreground whitespace-pre-line">
+                          {record.form.urgency}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-col">
+                        {record.form.email && (
+                          <span>
+                            <span className="font-medium text-foreground/80">Email:</span> {record.form.email}
+                          </span>
+                        )}
+                        {record.form.phone && (
+                          <span>
+                            <span className="font-medium text-foreground/80">Phone:</span> {record.form.phone}
+                          </span>
+                        )}
+                      </div>
+                      <span>
+                        Intake ID: <code className="text-foreground/80">{record.id}</code>
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function Chat() {
   const chatId = "001";
@@ -399,30 +606,49 @@ export function Chat() {
   });
 
   const [splitScreenMode, setSplitScreenMode] = React.useState<
-    "none" | "whyhire" | "eveideas" | "intake"
-  >("none");  const [panelVisible, setPanelVisible] = React.useState(false);
-
+    "none" | "whyhire" | "eveideas" | "intake" | "openIntakes"
+  >("none");
+  const [panelVisible, setPanelVisible] = React.useState(false);
   const rightPanelRef = React.useRef<HTMLDivElement | null>(null);
   const hasMessages = messages.length > 0;
+  const [intakeRecords, setIntakeRecords] = React.useState<IntakeRecord[]>([]);
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
 
+  const openPanel = React.useCallback(
+    (
+      mode: "whyhire" | "eveideas" | "intake" | "openIntakes",
+      { ensureVisible = true }: { ensureVisible?: boolean } = {},
+    ) => {
+      setSplitScreenMode(mode);
+      if (ensureVisible) {
+        requestAnimationFrame(() => setPanelVisible(true));
+      }
+    },
+    [],
+  );
+
   const handleWhyHireMe = () => {
-    setSplitScreenMode("whyhire");
-    requestAnimationFrame(() => setPanelVisible(true));
+    openPanel("whyhire");
   };
 
   const handleEveIdeas = () => {
-    setSplitScreenMode("eveideas");
-    requestAnimationFrame(() => setPanelVisible(true));
+    openPanel("eveideas");
   };
 
   const handleIntake = () => {
-    setSplitScreenMode("intake");
-    requestAnimationFrame(() => setPanelVisible(true));
+    openPanel("intake");
   };
 
+  const handleOpenIntakes = () => {
+    openPanel("openIntakes");
+  };
+
+  const handleIntakeSubmitted = (record: IntakeRecord) => {
+    setIntakeRecords((prev) => [record, ...prev]);
+    openPanel("openIntakes");
+  };
 
   const handleBackToChat = () => {
     setPanelVisible(false);
@@ -474,7 +700,7 @@ export function Chat() {
                       by Yasser Ali
                     </p>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     className="flex flex-row gap-2"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -482,7 +708,15 @@ export function Chat() {
                   >
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="secondary"
+                      className="px-3 py-1.5 text-sm font-semibold"
+                      onClick={handleOpenIntakes}
+                    >
+                      Open intakes (lawyers)
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="default"
                       className="px-3 py-1.5 text-sm font-semibold"
                       onClick={handleIntake}
                     >
@@ -516,10 +750,11 @@ export function Chat() {
           >
             {/* Show overview centered when no messages */}
             {!hasMessages && (
-              <Overview 
+              <Overview
                 onWhyHireMe={handleWhyHireMe}
                 onEveIdeas={handleEveIdeas}
                 onIntake={handleIntake}
+                onOpenIntakes={handleOpenIntakes}
               />
             )}
 
@@ -615,7 +850,12 @@ export function Chat() {
           <div className="flex-1 overflow-y-auto">
             {splitScreenMode === "whyhire" && <WhyHireMePanel />}
             {splitScreenMode === "eveideas" && <EveIdeasPanel />}
-            {splitScreenMode === "intake" && <IntakePanel />}
+            {splitScreenMode === "intake" && (
+              <IntakePanel onIntakeSubmitted={handleIntakeSubmitted} />
+            )}
+            {splitScreenMode === "openIntakes" && (
+              <OpenIntakesPanel records={intakeRecords} />
+            )}
           </div>
         </div>
       )}
