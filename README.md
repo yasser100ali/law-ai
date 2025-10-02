@@ -1,32 +1,32 @@
-# Law AI Assistant 🤖⚖️
+# Atlas
 
-An advanced AI-powered legal assistant platform featuring dual-agent architecture, document analysis via RAG (Retrieval-Augmented Generation), and real-time chat streaming. Built for both legal professionals and individuals seeking legal guidance.
+Atlas is a legal AI meant to speed up the process of filing an intake and finding the right lawyer for a plaintiff.
 
-## ✨ Features
+## Features
 
-### 🤖 Dual-Agent System
+### Dual-Agent System
 - **Lawyer Agent**: Provides professional legal analysis and advice
 - **Plaintiff Agent**: Advocates from the client's perspective
 - Intelligent agent selection based on conversation context
 
-### 📄 Document Processing & RAG
+### Document Processing & RAG
 - **Vector Store Integration**: Powered by OpenAI's vector stores API
 - **Document Upload**: Support for PDF, text, and other document formats
 - **Semantic Search**: Intelligent retrieval of relevant document sections
 - **Context Injection**: Automatically includes relevant document context in responses
 
-### 💬 Real-Time Chat
+### Real-Time Chat
 - **Streaming Responses**: Real-time token streaming for smooth UX
 - **File Attachments**: Upload and reference documents in conversations
 - **Chat History**: Persistent conversation management per chat session
 
-### 🛠️ Technical Stack
+### Technical Stack
 - **Frontend**: Next.js 13+ with TypeScript, Tailwind CSS
 - **Backend**: FastAPI with Python agents framework
 - **AI**: OpenAI GPT models with vector store integration
 - **Deployment**: Vercel-ready with environment-based configuration
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+
@@ -73,7 +73,7 @@ npm run dev
 5. **Open your browser**
 Navigate to `http://localhost:3000`
 
-## 🏗️ Architecture
+## Architecture
 
 ### System Components
 
@@ -99,7 +99,7 @@ Navigate to `http://localhost:3000`
 5. **AI Generation** → Enhanced prompt sent to OpenAI with full context
 6. **Streaming Response** → Real-time response streamed back to user
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -116,10 +116,10 @@ BLOB_READ_WRITE_TOKEN => make blob and get token, this uses vercel
 
 
 
-## 🙋‍♂️ Support
+## Support
 
 For questions, issues, or feature requests, please open an issue on GitHub or contact the maintainer.
 
 ---
 
-*Built with ❤️ by [Yasser Ali](https://github.com/yasser100ali) - Empowering legal accessibility through AI*
+Built by [Yasser Ali](https://github.com/yasser100ali)

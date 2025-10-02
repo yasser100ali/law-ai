@@ -11,13 +11,13 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: "Project for Eve AI :)",
+  title: "Atlas",
   description:
     "Use the Data Stream Protocol to stream chat completions from a Python endpoint (FastAPI) and display them using the useChat hook in your Next.js application.",
   openGraph: {
     images: [
       {
-        url: "/og?title=Project for Eve AI :)",
+        url: "/og?title=Atlas",
       },
     ],
   },
@@ -25,7 +25,7 @@ export const metadata = {
     card: "summary_large_image",
     images: [
       {
-        url: "/og?title=Project for Eve AI :)",
+        url: "/og?title=Atlas",
       },
     ],
   },
