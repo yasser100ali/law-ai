@@ -10,6 +10,7 @@ import type { Message } from "ai";
 import { useChat } from "ai/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -167,6 +168,420 @@ function IdeaCard({ title, children }: { title: string; children: React.ReactNod
   );
 }
 
+type IntakeRecord = {
+  id: string;
+  submittedAt: string;
+  shareWithMarketplace: boolean;
+  form: {
+    fullName: string;
+    email: string;
+    phone: string;
+    jurisdiction: string;
+    matterType: string;
+    summary: string;
+    goals: string;
+    urgency: string;
+  };
+};
+
+function IntakePanel({
+  onIntakeSubmitted,
+}: {
+  onIntakeSubmitted: (record: IntakeRecord) => void;
+}) {
+  const [formData, setFormData] = React.useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    jurisdiction: "",
+    matterType: "",
+    summary: "",
+    goals: "",
+    urgency: "",
+  });
+  const [shareWithMarketplace, setShareWithMarketplace] = React.useState(true);
+  const [consent, setConsent] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [hasSubmitted, setHasSubmitted] = React.useState(false);
+
+  const handleChange = (
+    field: keyof typeof formData,
+  ): React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> => {
+    return (event) => {
+      const value = event.target.value;
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    };
+  };
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    // Simulate a network request for now. This is where an API call would go.
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setHasSubmitted(true);
+      const record: IntakeRecord = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        submittedAt: new Date().toISOString(),
+        shareWithMarketplace,
+        form: { ...formData },
+      };
+      onIntakeSubmitted(record);
+      toast.success(
+        shareWithMarketplace
+          ? "Your intake is ready to share with matched firms."
+          : "Your intake has been saved."
+      );
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        jurisdiction: "",
+        matterType: "",
+        summary: "",
+        goals: "",
+        urgency: "",
+      });
+      setConsent(false);
+      setShareWithMarketplace(true);
+    }, 650);
+  };
+
+  const isValid =
+    formData.fullName.trim().length > 0 &&
+    formData.email.trim().length > 0 &&
+    formData.summary.trim().length > 0 &&
+    consent;
+
+  return (
+    <div className="flex flex-col h-full p-8 overflow-y-auto">
+      <div className="mx-auto w-full max-w-3xl space-y-8">
+        <div className="space-y-3">
+          <h2 className="text-3xl font-bold text-foreground">File an Intake with Eve</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            Capture the essentials of your legal matter once and let Eve handle the heavy lifting.
+            We&apos;ll structure your intake so that future marketplace partners can review cases ranked by
+            their fit—saving you the time of repeating your story to multiple firms.
+          </p>
+          <div className="rounded-lg border border-border/60 bg-muted/40 p-4 text-sm text-muted-foreground">
+            <p className="font-medium text-foreground">Coming soon</p>
+            <p>
+              After submission, you&apos;ll be able to post this intake to Eve&apos;s firm board where participating
+              firms are ranked by how well they match your needs. For now, fill out the form below to get
+              started and we&apos;ll notify you when sharing is available.
+            </p>
+          </div>
+        </div>
+
+        <form className="space-y-8" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-foreground">Full name *</span>
+              <input
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={handleChange("fullName")}
+                placeholder="Jane Doe"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-foreground">Email *</span>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange("email")}
+                placeholder="jane@example.com"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-foreground">Phone</span>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={handleChange("phone")}
+                placeholder="(555) 123-4567"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-foreground">Jurisdiction</span>
+              <input
+                type="text"
+                value={formData.jurisdiction}
+                onChange={handleChange("jurisdiction")}
+                placeholder="e.g. California, Los Angeles County"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              />
+            </label>
+            <label className="flex flex-col gap-2 md:col-span-2">
+              <span className="text-sm font-medium text-foreground">Matter type</span>
+              <input
+                type="text"
+                value={formData.matterType}
+                onChange={handleChange("matterType")}
+                placeholder="Employment, personal injury, mass tort, etc."
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              />
+            </label>
+          </div>
+
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-foreground">Describe what happened *</span>
+            <Textarea
+              required
+              value={formData.summary}
+              onChange={handleChange("summary")}
+              placeholder="Give us the key facts, timeline, and parties involved."
+              className="min-h-[140px]"
+            />
+          </label>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-foreground">What outcome are you hoping for?</span>
+              <Textarea
+                value={formData.goals}
+                onChange={handleChange("goals")}
+                placeholder="Settlement goals, desired remedies, or open questions."
+                className="min-h-[100px]"
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-foreground">Deadlines or urgency</span>
+              <Textarea
+                value={formData.urgency}
+                onChange={handleChange("urgency")}
+                placeholder="Upcoming court dates, statutes of limitation, or other timing notes."
+                className="min-h-[100px]"
+              />
+            </label>
+          </div>
+
+          <div className="space-y-3 rounded-lg border border-border/60 bg-background/40 p-4">
+            <p className="text-sm font-medium text-foreground">Marketplace preview</p>
+            <p className="text-sm text-muted-foreground">
+              Opt in to share this intake with Eve&apos;s partner firms when the board launches. We&apos;ll rank interested firms
+              by how closely they match your case profile so you can review the best fits first.
+            </p>
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border border-input"
+                checked={shareWithMarketplace}
+                onChange={(event) => setShareWithMarketplace(event.target.checked)}
+              />
+              Share my intake with matched firms when available
+            </label>
+          </div>
+
+          <label className="flex items-start gap-2 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              className="mt-1 h-4 w-4 rounded border border-input"
+              checked={consent}
+              onChange={(event) => setConsent(event.target.checked)}
+            />
+            <span>
+              I understand that Eve is not my attorney and that submitting this form does not create a lawyer-client relationship.
+              My information will be handled in accordance with Eve&apos;s privacy practices.
+            </span>
+          </label>
+
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? "Submitting..." : hasSubmitted ? "Update intake" : "Submit intake"}
+            </Button>
+            {hasSubmitted && (
+              <p className="text-sm text-muted-foreground">
+                Intake saved. We&apos;ll email you when sharing to firms is live.
+              </p>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function OpenIntakesPanel({
+  records,
+}: {
+  records: IntakeRecord[];
+}) {
+  const [matterFilter, setMatterFilter] = React.useState<string>("All");
+
+  const matterTypes = React.useMemo(() => {
+    const unique = new Set<string>();
+    records.forEach((record) => {
+      const trimmed = record.form.matterType.trim();
+      if (trimmed.length > 0) {
+        unique.add(trimmed);
+      }
+    });
+    return ["All", ...Array.from(unique).sort((a, b) => a.localeCompare(b))];
+  }, [records]);
+
+  const filteredRecords = React.useMemo(() => {
+    if (matterFilter === "All") {
+      return records;
+    }
+
+    return records.filter(
+      (record) => record.form.matterType.trim() === matterFilter,
+    );
+  }, [records, matterFilter]);
+
+  return (
+    <div className="flex flex-col h-full p-8 overflow-y-auto">
+      <div className="mx-auto w-full max-w-4xl space-y-8">
+        <div className="space-y-3">
+          <h2 className="text-3xl font-bold text-foreground">
+            Open Intakes (for lawyers only)
+          </h2>
+          <p className="text-muted-foreground leading-relaxed">
+            Review the latest claimant submissions and filter by matter type to
+            focus on the cases that best match your practice areas.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-4 rounded-lg border border-border/60 bg-background/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Matter type</p>
+            <p className="text-xs text-muted-foreground">
+              Filter intakes by the matter type provided by the claimant.
+            </p>
+          </div>
+          <select
+            value={matterFilter}
+            onChange={(event) => setMatterFilter(event.target.value)}
+            className="w-full sm:w-56 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+          >
+            {matterTypes.map((type) => (
+              <option key={type} value={type}>
+                {type === "All" ? "All matter types" : type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {filteredRecords.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 p-8 text-center">
+            <p className="text-sm font-medium text-foreground">
+              {records.length === 0
+                ? "No intakes have been filed yet."
+                : "No intakes match this matter type filter."}
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Once claimants submit intake forms, they will appear here for
+              review.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredRecords.map((record) => {
+              const submittedDate = new Date(record.submittedAt);
+              const formattedDate = submittedDate.toLocaleString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              });
+
+              return (
+                <motion.div
+                  key={record.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="rounded-lg border border-border/60 bg-background/70 p-6 shadow-sm"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">
+                        {record.form.fullName || "Anonymous claimant"}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {formattedDate}
+                        {record.form.jurisdiction && ` · ${record.form.jurisdiction}`}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      {record.form.matterType && (
+                        <span className="rounded-full border border-border/60 px-3 py-1 text-foreground">
+                          {record.form.matterType}
+                        </span>
+                      )}
+                      <span className="rounded-full border border-border/60 px-3 py-1">
+                        {record.shareWithMarketplace
+                          ? "Opted into marketplace"
+                          : "Private intake"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-3 text-sm text-foreground/90">
+                    <div>
+                      <p className="font-medium text-foreground">Summary</p>
+                      <p className="text-muted-foreground whitespace-pre-line">
+                        {record.form.summary || "No summary provided."}
+                      </p>
+                    </div>
+
+                    {record.form.goals && (
+                      <div>
+                        <p className="font-medium text-foreground">Desired outcome</p>
+                        <p className="text-muted-foreground whitespace-pre-line">
+                          {record.form.goals}
+                        </p>
+                      </div>
+                    )}
+
+                    {record.form.urgency && (
+                      <div>
+                        <p className="font-medium text-foreground">Urgency notes</p>
+                        <p className="text-muted-foreground whitespace-pre-line">
+                          {record.form.urgency}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-col">
+                        {record.form.email && (
+                          <span>
+                            <span className="font-medium text-foreground/80">Email:</span> {record.form.email}
+                          </span>
+                        )}
+                        {record.form.phone && (
+                          <span>
+                            <span className="font-medium text-foreground/80">Phone:</span> {record.form.phone}
+                          </span>
+                        )}
+                      </div>
+                      <span>
+                        Intake ID: <code className="text-foreground/80">{record.id}</code>
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function Chat() {
   const chatId = "001";
 
@@ -190,22 +605,49 @@ export function Chat() {
     },
   });
 
-  const [splitScreenMode, setSplitScreenMode] = React.useState<"none" | "whyhire" | "eveideas">("none");
+  const [splitScreenMode, setSplitScreenMode] = React.useState<
+    "none" | "whyhire" | "eveideas" | "intake" | "openIntakes"
+  >("none");
   const [panelVisible, setPanelVisible] = React.useState(false);
   const rightPanelRef = React.useRef<HTMLDivElement | null>(null);
   const hasMessages = messages.length > 0;
+  const [intakeRecords, setIntakeRecords] = React.useState<IntakeRecord[]>([]);
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
 
+  const openPanel = React.useCallback(
+    (
+      mode: "whyhire" | "eveideas" | "intake" | "openIntakes",
+      { ensureVisible = true }: { ensureVisible?: boolean } = {},
+    ) => {
+      setSplitScreenMode(mode);
+      if (ensureVisible) {
+        requestAnimationFrame(() => setPanelVisible(true));
+      }
+    },
+    [],
+  );
+
   const handleWhyHireMe = () => {
-    setSplitScreenMode("whyhire");
-    requestAnimationFrame(() => setPanelVisible(true));
+    openPanel("whyhire");
   };
 
   const handleEveIdeas = () => {
-    setSplitScreenMode("eveideas");
-    requestAnimationFrame(() => setPanelVisible(true));
+    openPanel("eveideas");
+  };
+
+  const handleIntake = () => {
+    openPanel("intake");
+  };
+
+  const handleOpenIntakes = () => {
+    openPanel("openIntakes");
+  };
+
+  const handleIntakeSubmitted = (record: IntakeRecord) => {
+    setIntakeRecords((prev) => [record, ...prev]);
+    openPanel("openIntakes");
   };
 
   const handleBackToChat = () => {
@@ -258,12 +700,28 @@ export function Chat() {
                       by Yasser Ali
                     </p>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     className="flex flex-row gap-2"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.3 }}
                   >
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="px-3 py-1.5 text-sm font-semibold"
+                      onClick={handleOpenIntakes}
+                    >
+                      Open intakes (lawyers)
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      className="px-3 py-1.5 text-sm font-semibold"
+                      onClick={handleIntake}
+                    >
+                      File an intake
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
@@ -292,9 +750,11 @@ export function Chat() {
           >
             {/* Show overview centered when no messages */}
             {!hasMessages && (
-              <Overview 
+              <Overview
                 onWhyHireMe={handleWhyHireMe}
                 onEveIdeas={handleEveIdeas}
+                onIntake={handleIntake}
+                onOpenIntakes={handleOpenIntakes}
               />
             )}
 
@@ -390,6 +850,12 @@ export function Chat() {
           <div className="flex-1 overflow-y-auto">
             {splitScreenMode === "whyhire" && <WhyHireMePanel />}
             {splitScreenMode === "eveideas" && <EveIdeasPanel />}
+            {splitScreenMode === "intake" && (
+              <IntakePanel onIntakeSubmitted={handleIntakeSubmitted} />
+            )}
+            {splitScreenMode === "openIntakes" && (
+              <OpenIntakesPanel records={intakeRecords} />
+            )}
           </div>
         </div>
       )}

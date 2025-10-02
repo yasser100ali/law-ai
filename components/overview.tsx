@@ -5,9 +5,16 @@ import { Button } from "./ui/button";
 interface OverviewProps {
   onWhyHireMe: () => void;
   onEveIdeas: () => void;
+  onIntake: () => void;
+  onOpenIntakes: () => void;
 }
 
-export const Overview = ({ onWhyHireMe, onEveIdeas }: OverviewProps) => {
+export const Overview = ({
+  onWhyHireMe,
+  onEveIdeas,
+  onIntake,
+  onOpenIntakes,
+}: OverviewProps) => {
   return (
     <div className="w-full h-full flex items-center justify-center px-6 relative overflow-hidden">
       {/* Subtle grid background */}
@@ -61,6 +68,22 @@ export const Overview = ({ onWhyHireMe, onEveIdeas }: OverviewProps) => {
               onClick={onEveIdeas}
             >
               How Eve can dominate the Legal AI Market
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              onClick={onIntake}
+            >
+              File an intake with Eve
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              onClick={onOpenIntakes}
+            >
+              Open intakes (lawyers)
             </Button>
           </div>
         </div>
