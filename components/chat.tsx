@@ -101,7 +101,7 @@ function EveIdeasPanel() {
   return (
     <div className="flex flex-col h-full p-8 overflow-y-auto">
       <div className="mx-auto w-full max-w-3xl space-y-8">
-        <h2 className="text-3xl font-bold text-foreground">How Eve can dominate the Legal AI Market</h2>
+        <h2 className="text-3xl font-bold text-foreground">How Eve can dominate Legal AI</h2>
 
         {/* 1) Market size & context */}
         <IdeaCard title="Market Size (Why Now)">
@@ -261,7 +261,7 @@ function IntakePanel({
     <div className="flex flex-col h-full p-8 overflow-y-auto">
       <div className="mx-auto w-full max-w-3xl space-y-8">
         <div className="space-y-3">
-          <h2 className="text-3xl font-bold text-foreground">File an Intake with Eve</h2>
+          <h2 className="text-3xl font-bold text-foreground">File an Intake</h2>
           <p className="text-muted-foreground leading-relaxed">
             Capture the essentials of your legal matter once and let Eve handle the heavy lifting.
             We&apos;ll structure your intake so that future marketplace partners can review cases ranked by
@@ -701,7 +701,7 @@ export function Chat() {
                     </p>
                   </motion.div>
                   <motion.div
-                    className="flex flex-row gap-2"
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.3 }}
@@ -709,15 +709,15 @@ export function Chat() {
                     <Button
                       size="sm"
                       variant="secondary"
-                      className="px-3 py-1.5 text-sm font-semibold"
+                      className="w-full px-3 py-1.5 text-sm font-semibold"
                       onClick={handleOpenIntakes}
                     >
-                      Open intakes (lawyers)
+                      Open intakes (for lawyers)
                     </Button>
                     <Button
                       size="sm"
                       variant="default"
-                      className="px-3 py-1.5 text-sm font-semibold"
+                      className="w-full px-3 py-1.5 text-sm font-semibold"
                       onClick={handleIntake}
                     >
                       File an intake
@@ -725,7 +725,7 @@ export function Chat() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="px-3 py-1.5 text-sm font-semibold"
+                      className="w-full px-3 py-1.5 text-sm font-semibold"
                       onClick={handleWhyHireMe}
                     >
                       Why hire me?
@@ -733,10 +733,10 @@ export function Chat() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="px-3 py-1.5 text-sm font-semibold"
+                      className="w-full px-3 py-1.5 text-sm font-semibold"
                       onClick={handleEveIdeas}
                     >
-                      How Eve can dominate the Legal AI Market
+                      How Eve can dominate Legal AI
                     </Button>
                   </motion.div>
                 </div>

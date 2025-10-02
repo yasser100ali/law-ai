@@ -52,11 +52,11 @@ export const Overview = ({
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 w-full max-w-3xl">
             <Button
               size="lg"
               variant="outline"
-              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onWhyHireMe}
             >
               Why hire me?
@@ -64,26 +64,26 @@ export const Overview = ({
             <Button
               size="lg"
               variant="outline"
-              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onEveIdeas}
             >
-              How Eve can dominate the Legal AI Market
+              How Eve can dominate Legal AI
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onIntake}
             >
-              File an intake with Eve
+              File an intake
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-8 py-6 text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
               onClick={onOpenIntakes}
             >
-              Open intakes (lawyers)
+              Open intakes
             </Button>
           </div>
         </div>
