@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import type { Intake } from "@prisma/client";
 
 // GET /api/intakes - Fetch all intakes
 export async function GET() {
@@ -11,7 +12,7 @@ export async function GET() {
     });
 
     // Transform database records to match IntakeRecord type
-    const transformedIntakes = intakes.map((intake) => ({
+    const transformedIntakes = intakes.map((intake: Intake) => ({
       id: intake.id,
       submittedAt: intake.submittedAt.toISOString(),
       shareWithMarketplace: intake.shareWithMarketplace,
