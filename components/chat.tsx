@@ -49,9 +49,32 @@ export function Chat() {
   const rightPanelRef = React.useRef<HTMLDivElement | null>(null);
   const hasMessages = messages.length > 0;
   const [intakeRecords, setIntakeRecords] = React.useState<IntakeRecord[]>([]);
+  const [isLoadingIntakes, setIsLoadingIntakes] = React.useState(false);
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
+
+  // Load intakes from database on mount
+  React.useEffect(() => {
+    const loadIntakes = async () => {
+      setIsLoadingIntakes(true);
+      try {
+        const response = await fetch("/api/intakes");
+        if (response.ok) {
+          const intakes = await response.json();
+          setIntakeRecords(intakes);
+        } else {
+          console.error("Failed to load intakes");
+        }
+      } catch (error) {
+        console.error("Error loading intakes:", error);
+      } finally {
+        setIsLoadingIntakes(false);
+      }
+    };
+
+    loadIntakes();
+  }, []);
 
   const openPanel = React.useCallback(
     (

@@ -36,26 +36,38 @@ function IntakePanel({
     };
   };
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate a network request for now. This is where an API call would go.
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/intakes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          shareWithMarketplace,
+          form: formData,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit intake");
+      }
+
+      const record: IntakeRecord = await response.json();
+      
       setIsSubmitting(false);
       setHasSubmitted(true);
-      const record: IntakeRecord = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        submittedAt: new Date().toISOString(),
-        shareWithMarketplace,
-        form: { ...formData },
-      };
       onIntakeSubmitted(record);
+      
       toast.success(
         shareWithMarketplace
           ? "Your intake is ready to share with matched firms."
           : "Your intake has been saved."
       );
+      
       setFormData({
         fullName: "",
         email: "",
@@ -68,7 +80,11 @@ function IntakePanel({
       });
       setConsent(false);
       setShareWithMarketplace(true);
-    }, 650);
+    } catch (error) {
+      setIsSubmitting(false);
+      toast.error("Failed to submit intake. Please try again.");
+      console.error("Error submitting intake:", error);
+    }
   };
 
   const isValid =
