@@ -75,7 +75,7 @@ export function WhyHireMePanel() {
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
             <li><strong>Applied Mathematics (UCSB):</strong> strong stats/optimization; PyTorch, TensorFlow, scikit‑learn, NumPy/SciPy.</li>
             <li><strong>Stack:</strong> FastAPI/Python, Next.js/React/TypeScript, OpenAI APIs/Agents, RAG, CI/CD on Vercel/GCP.</li>
-            <li><strong>Mission fit:</strong> Eve's vision of AI‑native plaintiff firms aligns with my plaintiff‑side intake + case‑scoring wedge; ready to partner with attorneys and ship court‑safe, end‑to‑end features.</li>
+            <li><strong>Mission fit:</strong> Eve&apos;s vision of AI‑native plaintiff firms aligns with my plaintiff‑side intake + case‑scoring wedge; ready to partner with attorneys and ship court‑safe, end‑to‑end features.</li>
           </ul>
         </Card>
       </div>

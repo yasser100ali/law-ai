@@ -22,6 +22,14 @@ import { ArrowUpIcon, StopIcon } from "./icons";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 
+const SUPPORTED_MIME_TYPES = [
+  "application/pdf",
+  "text/csv",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+] as const;
+
 export function MultimodalInput({
   chatId,
   input,
@@ -110,26 +118,18 @@ export function MultimodalInput({
     adjustHeight();
   };
 
-  const SUPPORTED = [
-    "application/pdf",
-    "text/csv",
-    "application/vnd.ms-excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "text/plain",
-  ] as const;
-
-  const isSupported = (file: File) =>
-    SUPPORTED.includes(file.type as any) ||
+  const isSupported = useCallback((file: File) =>
+    SUPPORTED_MIME_TYPES.includes(file.type as any) ||
     file.name.toLowerCase().endsWith(".csv") ||
     file.name.toLowerCase().endsWith(".xlsx") ||
-    file.name.toLowerCase().endsWith(".xls");
+    file.name.toLowerCase().endsWith(".xls"), []);
 
   const withinSize = (file: File) => {
     const max = file.type.includes("pdf") ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
     return file.size <= max;
   };
 
-  const filterValid = (files: FileList | File[]) =>
+  const filterValid = useCallback((files: FileList | File[]) =>
     Array.from(files).filter((file) => {
       const okType = isSupported(file);
       if (!okType) {
@@ -146,7 +146,7 @@ export function MultimodalInput({
         );
       }
       return okType && okSize;
-    });
+    }), [isSupported]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -244,7 +244,7 @@ export function MultimodalInput({
       window.removeEventListener("drop", onWindowDrop);
       window.removeEventListener("dragleave", onWindowDragLeave);
     };
-  }, []);
+  }, [filterValid]);
 
   // === NEW: Blob upload on submit ===
   const submitForm = useCallback(() => {

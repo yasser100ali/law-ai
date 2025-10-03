@@ -27,14 +27,14 @@ export function EveIdeasPanel() {
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
             <li><strong>Legal tech spend:</strong> ≈ <strong>$27–32B</strong>, growing high single digits; overall legal services are ≈ <strong>$1T+</strong>.</li>
             <li><strong>Where adoption starts:</strong> Research/drafting, intake & triage, and eDiscovery/CLM are the fastest-moving GenAI entry points.</li>
-            <li><strong>Eve's focus:</strong> Win the first touch with claimants, then expand into firm workflows.</li>
+            <li><strong>Eve&apos;s focus:</strong> Win the first touch with claimants, then expand into firm workflows.</li>
           </ul>
         </IdeaCard>
 
         {/* 2) Plaintiff wedge */}
         <IdeaCard title="Plaintiff-Side Intake & Case Score (Your Wedge)">
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-            <li>Turn a user's story into a structured <em>case portfolio</em>: <strong>Strength (0–100)</strong>, <strong>deadline window (SOL)</strong>, <strong>top gaps</strong>, and <strong>venue fit</strong>.</li>
+            <li>Turn a user&apos;s story into a structured <em>case portfolio</em>: <strong>Strength (0–100)</strong>, <strong>deadline window (SOL)</strong>, <strong>top gaps</strong>, and <strong>venue fit</strong>.</li>
             <li>Ask missing questions so law-firm time is <strong>well-spent</strong>; output a clean, lawyer-ready report.</li>
             <li>Route to best-fit firms by jurisdiction/practice. If a firm takes the case, <strong>Eve earns a commission</strong>; optional, clearly labeled <em>Premium Placement</em> for visibility.</li>
             <li>Result: aligned incentives and Eve becomes the default first stop for claimants.</li>
