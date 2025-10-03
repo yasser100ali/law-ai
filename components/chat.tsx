@@ -110,6 +110,10 @@ export function Chat() {
     openPanel("openIntakes");
   };
 
+  const handleDeleteIntake = (id: string) => {
+    setIntakeRecords((prev) => prev.filter((record) => record.id !== id));
+  };
+
   const handleBackToChat = () => {
     setPanelVisible(false);
     const node = rightPanelRef.current;
@@ -314,7 +318,10 @@ export function Chat() {
               <IntakePanel onIntakeSubmitted={handleIntakeSubmitted} />
             )}
             {splitScreenMode === "openIntakes" && (
-              <OpenIntakesPanel records={intakeRecords} />
+              <OpenIntakesPanel 
+                records={intakeRecords} 
+                onDeleteIntake={handleDeleteIntake}
+              />
             )}
           </div>
         </div>

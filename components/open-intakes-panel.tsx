@@ -1,11 +1,15 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { IntakeRecord } from "@/types/intake";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 function OpenIntakesPanel({
   records,
+  onDeleteIntake,
 }: {
   records: IntakeRecord[];
+  onDeleteIntake: (id: string) => void;
 }) {
   const [matterFilter, setMatterFilter] = React.useState<string>("All");
 
@@ -29,6 +33,39 @@ function OpenIntakesPanel({
       (record) => record.form.matterType.trim() === matterFilter,
     );
   }, [records, matterFilter]);
+
+  const [deletingIds, setDeletingIds] = React.useState<Set<string>>(new Set());
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this intake? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeletingIds((prev) => new Set(prev).add(id));
+
+    try {
+      const response = await fetch(`/api/intakes/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Intake deleted successfully");
+        onDeleteIntake(id);
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to delete intake");
+      }
+    } catch (error) {
+      console.error("Error deleting intake:", error);
+      toast.error("Failed to delete intake");
+    } finally {
+      setDeletingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col h-full p-8 overflow-y-auto">
@@ -96,7 +133,7 @@ function OpenIntakesPanel({
                   className="rounded-lg border border-border/60 bg-background/70 p-6 shadow-sm"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-xl font-semibold text-foreground">
                         {record.form.fullName || "Anonymous claimant"}
                       </h3>
@@ -105,17 +142,28 @@ function OpenIntakesPanel({
                         {record.form.jurisdiction && ` · ${record.form.jurisdiction}`}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      {record.form.matterType && (
-                        <span className="rounded-full border border-border/60 px-3 py-1 text-foreground">
-                          {record.form.matterType}
+                    <div className="flex flex-wrap gap-2 items-start">
+                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                        {record.form.matterType && (
+                          <span className="rounded-full border border-border/60 px-3 py-1 text-foreground">
+                            {record.form.matterType}
+                          </span>
+                        )}
+                        <span className="rounded-full border border-border/60 px-3 py-1">
+                          {record.shareWithMarketplace
+                            ? "Opted into marketplace"
+                            : "Private intake"}
                         </span>
-                      )}
-                      <span className="rounded-full border border-border/60 px-3 py-1">
-                        {record.shareWithMarketplace
-                          ? "Opted into marketplace"
-                          : "Private intake"}
-                      </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDelete(record.id)}
+                        disabled={deletingIds.has(record.id)}
+                        className="h-7 px-3 text-xs"
+                      >
+                        {deletingIds.has(record.id) ? "Deleting..." : "Delete"}
+                      </Button>
                     </div>
                   </div>
 
