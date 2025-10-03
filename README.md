@@ -1,4 +1,3 @@
-
 Atlas
 =====
 
@@ -79,7 +78,6 @@ Quick Start
 
 Prerequisites
 ~~~~~~~~~~~~~
-- Node.js 18+
 - Python 3.11+
 - OpenAI API key
 
@@ -87,10 +85,15 @@ Installation
 ~~~~~~~~~~~~
 
 1. Clone the repository
+
+   ```bash
    git clone https://github.com/yasser100ali/law-ai.git
    cd law-ai
+   ```
 
 2. Install dependencies
+
+   ```bash
    # Frontend
    npm install
    # or
@@ -98,20 +101,28 @@ Installation
 
    # Backend
    pip install -r requirements.txt
+   ```
 
 3. Environment Setup
+
+   ```bash
    cp .env.example .env.local
    # Edit .env.local and add your OpenAI API key
    OPENAI_API_KEY=your_openai_api_key_here
+   ```
 
 4. Run locally
+
+   ```bash
    # Backend
    uvicorn api.index:app --host 0.0.0.0 --port 8000 --reload
 
    # Frontend
    npm run dev
+   ```
 
 5. Open browser
+
    Navigate to http://localhost:3000
 
 Architecture
@@ -119,10 +130,13 @@ Architecture
 
 System Components
 ~~~~~~~~~~~~~~~~~
+
+```
 Next.js UI (Frontend)  →  FastAPI API (Backend)  →  OpenAI API (AI Models)
         |                          |                          |
         v                          v                          v
 Chat Interface + File Upload   Dual Agents (Lawyer/Plaintiff)   Vector Stores + RAG
+```
 
 Data Flow
 ~~~~~~~~~
@@ -138,10 +152,13 @@ Configuration
 
 Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
+
 Create `.env.local` with:
 
+```bash
 OPENAI_API_KEY=your_openai_api_key_here
 BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
+```
 
 Support
 -------

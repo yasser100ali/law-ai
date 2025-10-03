@@ -323,13 +323,23 @@ function IntakePanel({
             </label>
             <label className="flex flex-col gap-2 md:col-span-2">
               <span className="text-sm font-medium text-foreground">Matter type</span>
-              <input
-                type="text"
+              <select
                 value={formData.matterType}
-                onChange={handleChange("matterType")}
-                placeholder="Employment, personal injury, mass tort, etc."
+                onChange={(event) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    matterType: event.target.value,
+                  }));
+                }}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-              />
+              >
+                <option value="">Select matter type</option>
+                <option value="employment">Employment</option>
+                <option value="personal injury">Personal Injury</option>
+                <option value="mass tort/class action">Mass Tort/Class Action</option>
+                <option value="family law">Family Law</option>
+                <option value="immigration law">Immigration Law</option>
+              </select>
             </label>
           </div>
 
