@@ -12,8 +12,10 @@ from agents import Agent, Runner, WebSearchTool, CodeInterpreterTool
 from pypdf import PdfReader 
 
 # subagent
-from .lawyer_and_plaintiff_agents import plaintiffAgent, lawyerAgent
+from .plaintiff_agent import plaintiffAgent
+from .lawyer_agent import lawyerAgent
 
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -208,9 +210,7 @@ async def stream_chat_py(
         selected_chat_mode,
     )
 
-    code_tool = CodeInterpreterTool(
-        tool_config={"type": "code_interpreter", "container": {"type": "auto"}}
-    )
+
     
     instructions = """
     You are part of a full-stack demo built by AI Engineer **Yasser Ali** (Next.js frontend, FastAPI+Python backend). 
