@@ -195,20 +195,52 @@ OUTPUT: Always return valid JSON matching the requested structure.
     try:
         # Run the agent
         logger.info("🤖 Running intake analysis agent...")
-        result = await Runner.run(starting_agent=agent, input=analysis_prompt)
+        run_result = await Runner.run(starting_agent=agent, input=analysis_prompt)
         logger.info("✅ Intake analysis completed")
+        
+        # Extract text from RunResult object
+        # Log what we got to help debug
+        logger.info("RunResult type: %s", type(run_result))
+        logger.info("RunResult attributes: %s", dir(run_result))
+        
+        # Try different ways to extract the result
+        result_text = ""
+        
+        # Method 1: Check if it's just a string (non-async version)
+        if isinstance(run_result, str):
+            result_text = run_result
+        # Method 2: Try .content attribute
+        elif hasattr(run_result, 'content'):
+            result_text = run_result.content
+        # Method 3: Try .messages attribute
+        elif hasattr(run_result, 'messages') and run_result.messages:
+            for msg in reversed(run_result.messages):
+                if hasattr(msg, 'get') and msg.get('role') == 'assistant':
+                    result_text = msg.get('content', '')
+                    break
+                elif hasattr(msg, 'role') and msg.role == 'assistant':
+                    result_text = msg.content if hasattr(msg, 'content') else str(msg)
+                    break
+        # Method 4: Just convert to string
+        else:
+            result_text = str(run_result)
+        
+        logger.info("Extracted result text length: %d", len(result_text))
+        logger.debug("Raw result text (first 500 chars): %s", result_text[:500])
         
         # Try to parse as JSON, fall back to structured parsing if needed
         import json
         import re
         
         # Extract JSON from markdown code blocks if present
-        json_match = re.search(r'```(?:json)?\s*(\{.*\})\s*```', result, re.DOTALL)
+        json_match = re.search(r'```(?:json)?\s*(\{.*\})\s*```', result_text, re.DOTALL)
         if json_match:
-            result = json_match.group(1)
+            json_str = json_match.group(1)
+        else:
+            json_str = result_text
         
         try:
-            analysis = json.loads(result)
+            analysis = json.loads(json_str)
         except json.JSONDecodeError:
             logger.warning("Failed to parse JSON response, using fallback structure")
             # Fallback structure
@@ -223,7 +255,7 @@ OUTPUT: Always return valid JSON matching the requested structure.
                     "likelihoodOfSuccess": 5,
                     "explanation": "Unable to parse detailed breakdown"
                 },
-                "reasoning": result,
+                "reasoning": result_text,
                 "warnings": [],
                 "recommendedFirms": [],
                 "applicableLaws": []
