@@ -1,7 +1,10 @@
 from agents import Agent, Runner, WebSearchTool, function_tool
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
     
 # Plaintiff Agent Instructions
 plaintiff_instructions = """
@@ -73,14 +76,36 @@ BE concise in your speech, try to give as useful information as possible, direct
 Tell the user which laws are broken and why. Make a table of this and site the source.
 """.strip()
 
-_PLAINTIFF_AGENT = Agent(
-    name="plaintiff-agent",
-    model="gpt-4.1",
-    instructions=plaintiff_instructions,
-    tools=[WebSearchTool()],
-)
 
 @function_tool(name_override="plaintiffAgent")
 def plaintiffAgent(query: str) -> str:
-    agent = Runner(_PLAINTIFF_AGENT).run(query)
-    return agent
+    """
+    Handle plaintiff-side legal queries: case evaluation, law firm recommendations, 
+    and guidance for potential plaintiffs.
+    
+    Args:
+        query: The user's question or case details
+        
+    Returns:
+        Agent response with case analysis and recommendations
+    """
+
+    agent = Agent(
+        name="plaintiff-agent",
+        model="gpt-4.1",
+        instructions=plaintiff_instructions,
+        tools=[WebSearchTool()],
+    )
+
+    logger.info("=" * 80)
+    logger.info("🔵 PLAINTIFF AGENT CALLED")
+    logger.info("Query: %s", query[:200] + "..." if len(query) > 200 else query)
+    logger.info("=" * 80)
+    
+    try:
+        result = Runner.run(starting_agent=agent, input=query)
+        logger.info("✅ Plaintiff Agent completed successfully")
+        return result
+    except Exception as e:
+        logger.error("❌ Plaintiff Agent failed: %s", str(e), exc_info=True)
+        raise

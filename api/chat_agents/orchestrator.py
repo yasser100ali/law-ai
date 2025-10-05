@@ -204,11 +204,18 @@ async def stream_chat_py(
 ) -> AsyncIterator[str]:
 
     start_time = time.time()
-    logger.info(
-        "stream_chat_py invoked | messages=%d selected_chat_mode=%s",
-        len(messages or []),
-        selected_chat_mode,
-    )
+    logger.info("=" * 100)
+    logger.info("🚀 ORCHESTRATOR STARTED")
+    logger.info("Messages count: %d | Mode: %s", len(messages or []), selected_chat_mode)
+    
+    # Log the last user message for context
+    if messages:
+        last_msg = messages[-1]
+        last_content = str(last_msg.get("content", ""))[:300]
+        logger.info("Last message preview: %s%s", 
+                   last_content, 
+                   "..." if len(str(last_msg.get("content", ""))) > 300 else "")
+    logger.info("=" * 100)
 
 
     
@@ -348,23 +355,29 @@ async def stream_chat_py(
     agent_input = to_agent_messages(messages)
     logger.debug("agent_input_preview=%s", json.dumps(agent_input[-3:], ensure_ascii=False))
 
+    logger.info("📋 Orchestrator Agent Configuration:")
+    logger.info("  - Model: %s", getattr(agent, "model", "unknown"))
+    logger.info("  - Available tools: WebSearchTool, plaintiffAgent, lawyerAgent")
+    logger.info("  - Message history length: %d", len(agent_input))
+
     start_time = time.time()
 
     try:
-        logger.info(
-            "Runner.run_streamed start | model=%s tools=%d history=%d",
-            getattr(agent, "model", "unknown"),
-            len(getattr(agent, "tools", []) or []),
-            len(agent_input),
-        )
+        logger.info("▶️  Starting Runner.run_streamed...")
 
         streamed = Runner.run_streamed(agent, input=agent_input)
-        logger.info("Runner.run_streamed stream established")
+        logger.info("✅ Runner.run_streamed stream established")
 
         async for ev in streamed.stream_events():
             et = getattr(ev, "type", "")
+            
+            # Log all event types for debugging
             if et:
-                logger.debug("stream_event | type=%s", et)
+                logger.debug("📡 stream_event | type=%s", et)
+            
+            # Log tool calls specifically
+            if "tool" in et.lower() or "function" in et.lower():
+                logger.info("🔧 TOOL EVENT DETECTED: %s | data=%s", et, getattr(ev, "data", "N/A"))
 
             if et == "raw_response_event":
                 data = getattr(ev, "data", None)
@@ -409,4 +422,6 @@ async def stream_chat_py(
 
     finally:
         duration = time.time() - start_time
-        logger.info("stream_chat_py finished | duration_ms=%d", int(duration * 1000))
+        logger.info("=" * 100)
+        logger.info("🏁 ORCHESTRATOR FINISHED | duration=%d ms", int(duration * 1000))
+        logger.info("=" * 100)

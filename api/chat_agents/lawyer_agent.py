@@ -1,12 +1,15 @@
 from typing import Dict, Optional, List, Any, Literal
 from agents import Agent, Runner, WebSearchTool, function_tool
 from dotenv import load_dotenv
-import os 
+import os
+import logging
 # to retrieve data from postgres 
 import psycopg2
 import psycopg2.extras 
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 # Lawyer Agent Instructions
 lawyer_instructions = """
@@ -109,9 +112,8 @@ def stored_intake_retrieval(category: Optional[MatterType] = None) -> List[Dict[
     Returns:
         List of dictionaries, each representing one intake record from the database.
     """
-    print("Retrieving case details from Postgres")
-
-
+    logger.info("🔧 TOOL: stored_intake_retrieval | category=%s", category or "ALL")
+    
     DATABASE_URL = os.environ.get("DATABASE_URL")
 
     try:
@@ -130,23 +132,44 @@ def stored_intake_retrieval(category: Optional[MatterType] = None) -> List[Dict[
 
         cursor.close()
         conn.close()
-
+        
+        logger.info("✅ Retrieved %d intake(s) from database", len(intakes))
         return str(intakes)
 
     except Exception as e:
-        print("Error retrieving data:", e)
+        logger.error("❌ Database error in stored_intake_retrieval: %s", str(e), exc_info=True)
         return []
 
 
-_LAWYER_AGENT = Agent(
-   name="lawyer-agent",
-   model="gpt-4.1",
-   instructions=lawyer_instructions,
-   tools=[WebSearchTool(), stored_intake_retrieval],
-)
 
 @function_tool(name_override="lawyerAgent")
 def lawyerAgent(query: str) -> str:
-    print("Calling Lawyer Agent")
-    agent = Runner(_LAWYER_AGENT).run(query)
-    return agent
+    """
+    Handle lawyer-side legal queries: case evaluation, legal research, 
+    take/decline recommendations, and intake analysis.
+    
+    Args:
+        query: The user's question or case details
+        
+    Returns:
+        Agent response with legal analysis and recommendations
+    """
+    agent = Agent(
+        name="lawyer-agent",
+        model="gpt-4.1",
+        instructions=lawyer_instructions,
+        tools=[WebSearchTool(), stored_intake_retrieval],
+    )
+
+    logger.info("=" * 80)
+    logger.info("⚖️  LAWYER AGENT CALLED")
+    logger.info("Query: %s", query[:200] + "..." if len(query) > 200 else query)
+    logger.info("=" * 80)
+    
+    try:
+        result = Runner.run(starting_agent=agent, input=query)
+        logger.info("✅ Lawyer Agent completed successfully")
+        return result
+    except Exception as e:
+        logger.error("❌ Lawyer Agent failed: %s", str(e), exc_info=True)
+        raise
