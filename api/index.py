@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from .chat_agents.orchestrator import stream_chat_py
 from .utils.prompt import ClientMessage
 from .rag_store import ensure_vector_store, upload_blobs, search_store, format_results_for_prompt
+from .utils.tools import stored_intake_retrieval
 from openai import OpenAI
 
 load_dotenv(".env")
@@ -147,3 +148,33 @@ async def handle_chat_data(
     response = StreamingResponse(event_stream())
     response.headers["x-vercel-ai-data-stream"] = "v1"
     return response
+
+
+# Test endpoint for database tool
+@app.get("/api/test/intakes")
+async def test_intakes(category: Optional[str] = None):
+    """
+    Test endpoint to directly call stored_intake_retrieval tool
+    
+    Usage:
+    - GET /api/test/intakes - retrieves all intakes
+    - GET /api/test/intakes?category=employment - retrieves employment intakes only
+    
+    Valid categories: employment, personal injury, mass tort/class action, family law, immigration law
+    """
+    try:
+        result = stored_intake_retrieval(category=category)
+        return {
+            "success": True,
+            "category": category or "all",
+            "result": result,
+            "result_type": str(type(result)),
+            "result_length": len(str(result)) if result else 0
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "category": category or "all",
+            "error": str(e),
+            "error_type": str(type(e).__name__)
+        }

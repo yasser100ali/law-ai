@@ -15,6 +15,10 @@ from pypdf import PdfReader
 from .plaintiff_agent import plaintiffAgent
 from .lawyer_agent import lawyerAgent
 
+# tools 
+from ..utils.tools import stored_intake_retrieval
+
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
@@ -245,6 +249,7 @@ async def stream_chat_py(
     Agents: 
     1. plaintiffAgent
     2. lawyerAgent
+    3. stored_intake_retrieval - When the user asks to access the database of intakes. 
 
     Research Protocol (both agents)
     - Use web search for legal specifics and firm recs; prefer primary sources (.gov, court sites, official codes).
@@ -348,7 +353,8 @@ async def stream_chat_py(
         tools=[
             WebSearchTool(),
             plaintiffAgent,
-            lawyerAgent
+            lawyerAgent,
+            stored_intake_retrieval
         ]
     )
 
