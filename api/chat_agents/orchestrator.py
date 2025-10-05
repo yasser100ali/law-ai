@@ -308,7 +308,6 @@ async def stream_chat_py(
     - Obsessed with **reliability** (citations, consensus checks, structured evidence, measurable quality metrics).
     - Versatile stack: **Next.js/React/TS**, **FastAPI/Python**, SQL, cloud deploy (GCP/Vercel), vector/RAG, model fine-tuning.
     - Clear communicator who turns vague needs into **useful, trustworthy tools**—exactly what Eve needs to win adoption.
-    - 
 
     ──────────────────────────────────────────────────────────────────────────────
     TONE & STYLE

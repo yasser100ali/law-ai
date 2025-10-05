@@ -2,12 +2,11 @@ from agents import Agent, Runner, WebSearchTool, function_tool
 from dotenv import load_dotenv
 
 load_dotenv()
-
+    
 # Plaintiff Agent Instructions
 plaintiff_instructions = """
 Role & Mission
 You are an AI assistant designed to support potential plaintiffs seeking to understand whether they have a valid legal case and what their options are.
-
 Your responsibilities are to:
 - Clearly explain legal concepts in plain language.
 - Intake facts, identify potential claims or defenses, and assess case strength.

@@ -1,5 +1,10 @@
+from typing import Dict, Optional, List, Any, Literal
 from agents import Agent, Runner, WebSearchTool, function_tool
 from dotenv import load_dotenv
+import os 
+# to retrieve data from postgres 
+import psycopg2
+import psycopg2.extras 
 
 load_dotenv()
 
@@ -40,6 +45,10 @@ Workflow
 5. Next Steps
    - Evidence preservation, demand letters, agency filings, deadlines.
 
+
+1. Tools: stored_intake_retrieval
+    - Call when user asks to retreive intakes from the database
+
 ---
 Research Protocol
 - Always search the web for statutes, deadlines, and firm recommendations.
@@ -71,14 +80,73 @@ BE concise in your speech and give as useful information as possible.
 When possible tell the user which laws are broken and why. Make table of this and site source. 
 """.strip()
 
+
+MatterType = Literal[
+    "employment",
+    "personal injury",
+    "mass tort/class action",
+    "family law",
+    "immigration law"
+]
+
+
+@function_tool(name_override="stored_intake_retrieval")
+def stored_intake_retrieval(category: Optional[MatterType] = None) -> List[Dict[str, Any]]:
+    """
+    Retrieve intake cases stored in the database.
+
+    Behavior:
+    - If `category` is provided, only cases within that practice area are returned
+      (valid values: "employment", "personal injury", "mass tort/class action",
+      "family law", "immigration law"). Matching is case-insensitive.
+    - If no `category` is provided, all intake cases are returned.
+
+    Usage in workflow:
+    - Call this function whenever the user asks to "analyze over the intake cases"
+      or requests review of "existing cases" without providing any new context.
+      In those situations, the intent is to work with already-stored data.
+
+    Returns:
+        List of dictionaries, each representing one intake record from the database.
+    """
+    print("Retrieving case details from Postgres")
+
+
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        if category is not None:
+            normalized = category.lower()
+            query = "SELECT * FROM intakes WHERE LOWER(category) = %s ORDER BY submittedAt DESC;"
+            cursor.execute(query, (normalized,))
+        else:
+            query = "SELECT * FROM intakes ORDER BY submittedAt DESC;"
+            cursor.execute(query)
+
+        intakes = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return str(intakes)
+
+    except Exception as e:
+        print("Error retrieving data:", e)
+        return []
+
+
 _LAWYER_AGENT = Agent(
-    name="lawyer-agent",
-    model="gpt-4.1",
-    instructions=lawyer_instructions,
-    tools=[WebSearchTool()],
+   name="lawyer-agent",
+   model="gpt-4.1",
+   instructions=lawyer_instructions,
+   tools=[WebSearchTool(), stored_intake_retrieval],
 )
 
 @function_tool(name_override="lawyerAgent")
 def lawyerAgent(query: str) -> str:
+    print("Calling Lawyer Agent")
     agent = Runner(_LAWYER_AGENT).run(query)
     return agent
