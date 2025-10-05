@@ -27,6 +27,15 @@ model Intake {
   urgency               String
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+  
+  // AI Assessment Fields
+  aiSummary             String?  @db.Text
+  aiScore               Int?
+  aiScoreBreakdown      Json?
+  aiReasoning           String?  @db.Text
+  aiWarnings            Json?
+  recommendedFirms      Json?
+  applicableLaws        Json?
 
   @@map("intakes")
 }

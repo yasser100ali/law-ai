@@ -12,6 +12,7 @@ function OpenIntakesPanel({
   onDeleteIntake: (id: string) => void;
 }) {
   const [matterFilter, setMatterFilter] = React.useState<string>("All");
+  const [sortBy, setSortBy] = React.useState<"date" | "score">("date");
 
   const matterTypes = React.useMemo(() => {
     const unique = new Set<string>();
@@ -25,14 +26,31 @@ function OpenIntakesPanel({
   }, [records]);
 
   const filteredRecords = React.useMemo(() => {
-    if (matterFilter === "All") {
-      return records;
+    let filtered = records;
+    
+    // Apply matter type filter
+    if (matterFilter !== "All") {
+      filtered = records.filter(
+        (record) => record.form.matterType.trim() === matterFilter,
+      );
     }
 
-    return records.filter(
-      (record) => record.form.matterType.trim() === matterFilter,
-    );
-  }, [records, matterFilter]);
+    // Apply sorting
+    const sorted = [...filtered];
+    if (sortBy === "score") {
+      sorted.sort((a, b) => {
+        const scoreA = a.aiScore ?? -1;
+        const scoreB = b.aiScore ?? -1;
+        return scoreB - scoreA; // Highest score first
+      });
+    } else {
+      sorted.sort((a, b) => {
+        return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
+      });
+    }
+
+    return sorted;
+  }, [records, matterFilter, sortBy]);
 
   const [deletingIds, setDeletingIds] = React.useState<Set<string>>(new Set());
 
@@ -80,24 +98,44 @@ function OpenIntakesPanel({
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 rounded-lg border border-border/60 bg-background/40 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-foreground">Matter type</p>
-            <p className="text-xs text-muted-foreground">
-              Filter intakes by the matter type provided by the claimant.
-            </p>
+        <div className="flex flex-col gap-4 rounded-lg border border-border/60 bg-background/40 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <div>
+                <p className="text-sm font-medium text-foreground">Matter type</p>
+                <p className="text-xs text-muted-foreground">
+                  Filter intakes by the matter type.
+                </p>
+              </div>
+              <select
+                value={matterFilter}
+                onChange={(event) => setMatterFilter(event.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
+                {matterTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type === "All" ? "All matter types" : type}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div>
+                <p className="text-sm font-medium text-foreground">Sort by</p>
+                <p className="text-xs text-muted-foreground">
+                  Order intakes by date or AI score.
+                </p>
+              </div>
+              <select
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value as "date" | "score")}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
+                <option value="date">Most Recent</option>
+                <option value="score">Highest AI Score</option>
+              </select>
+            </div>
           </div>
-          <select
-            value={matterFilter}
-            onChange={(event) => setMatterFilter(event.target.value)}
-            className="w-full sm:w-56 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-          >
-            {matterTypes.map((type) => (
-              <option key={type} value={type}>
-                {type === "All" ? "All matter types" : type}
-              </option>
-            ))}
-          </select>
         </div>
 
         {filteredRecords.length === 0 ? (
@@ -134,9 +172,22 @@ function OpenIntakesPanel({
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-foreground">
-                        {record.form.fullName || "Anonymous claimant"}
-                      </h3>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-xl font-semibold text-foreground">
+                          {record.form.fullName || "Anonymous claimant"}
+                        </h3>
+                        {record.aiScore !== undefined && (
+                          <span className={`rounded-full px-3 py-1 text-xs font-bold ${
+                            record.aiScore >= 70 
+                              ? "bg-green-500/20 text-green-600 border border-green-500/40" 
+                              : record.aiScore >= 40 
+                              ? "bg-yellow-500/20 text-yellow-600 border border-yellow-500/40"
+                              : "bg-red-500/20 text-red-600 border border-red-500/40"
+                          }`}>
+                            AI Score: {record.aiScore}/100
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         {formattedDate}
                         {record.form.jurisdiction && ` · ${record.form.jurisdiction}`}
@@ -210,6 +261,76 @@ function OpenIntakesPanel({
                         Intake ID: <code className="text-foreground/80">{record.id}</code>
                       </span>
                     </div>
+
+                    {/* AI Analysis Section */}
+                    {record.aiScore !== undefined && (
+                      <details className="mt-4 rounded-md border border-primary/30 bg-primary/5">
+                        <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground hover:text-primary">
+                          📊 View AI Analysis & Recommendations
+                        </summary>
+                        <div className="space-y-4 px-4 pb-4 pt-2">
+                          {record.aiSummary && (
+                            <div>
+                              <p className="font-medium text-foreground text-sm">AI Summary</p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {record.aiSummary}
+                              </p>
+                            </div>
+                          )}
+
+                          {record.aiScoreBreakdown && (
+                            <div>
+                              <p className="font-medium text-foreground text-sm mb-2">Score Breakdown</p>
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div className="flex justify-between bg-background/60 rounded px-2 py-1">
+                                  <span>Legal Merit:</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown.legalMerit}/30</span>
+                                </div>
+                                <div className="flex justify-between bg-background/60 rounded px-2 py-1">
+                                  <span>Evidence:</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown.evidenceQuality}/20</span>
+                                </div>
+                                <div className="flex justify-between bg-background/60 rounded px-2 py-1">
+                                  <span>Damages:</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown.damagesPotential}/25</span>
+                                </div>
+                                <div className="flex justify-between bg-background/60 rounded px-2 py-1">
+                                  <span>Procedural:</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown.proceduralViability}/15</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {record.aiWarnings && record.aiWarnings.length > 0 && (
+                            <div>
+                              <p className="font-medium text-foreground text-sm mb-2">⚠️ Warnings</p>
+                              <ul className="space-y-1 text-xs">
+                                {record.aiWarnings.map((warning, idx) => (
+                                  <li key={idx} className="bg-yellow-500/10 border border-yellow-500/30 rounded px-2 py-1">
+                                    {warning}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {record.recommendedFirms && record.recommendedFirms.length > 0 && (
+                            <div>
+                              <p className="font-medium text-foreground text-sm mb-2">Recommended Firms ({record.recommendedFirms.length})</p>
+                              <div className="text-xs text-muted-foreground">
+                                {record.recommendedFirms.map((firm, idx) => (
+                                  <span key={idx}>
+                                    {firm.name}
+                                    {idx < record.recommendedFirms!.length - 1 ? ", " : ""}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    )}
                   </div>
                 </motion.div>
               );

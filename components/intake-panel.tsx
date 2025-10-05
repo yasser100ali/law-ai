@@ -23,6 +23,7 @@ function IntakePanel({
   const [consent, setConsent] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [hasSubmitted, setHasSubmitted] = React.useState(false);
+  const [submittedIntake, setSubmittedIntake] = React.useState<IntakeRecord | null>(null);
 
   const handleChange = (
     field: keyof typeof formData,
@@ -60,14 +61,24 @@ function IntakePanel({
       
       setIsSubmitting(false);
       setHasSubmitted(true);
+      setSubmittedIntake(record);
       onIntakeSubmitted(record);
       
-      toast.success(
-        shareWithMarketplace
-          ? "Your intake is ready to share with matched firms."
-          : "Your intake has been saved."
-      );
+      // Show appropriate toast based on AI analysis
+      if (record.aiScore !== undefined) {
+        toast.success(
+          `Intake submitted! AI Case Strength Score: ${record.aiScore}/100`,
+          { duration: 5000 }
+        );
+      } else {
+        toast.success(
+          shareWithMarketplace
+            ? "Your intake is ready to share with matched firms."
+            : "Your intake has been saved."
+        );
+      }
       
+      // Reset form for new submission
       setFormData({
         fullName: "",
         email: "",
@@ -252,6 +263,155 @@ function IntakePanel({
             )}
           </div>
         </form>
+
+        {/* AI Assessment Results */}
+        {submittedIntake && submittedIntake.aiScore !== undefined && (
+          <div className="mt-8 space-y-6 rounded-lg border-2 border-primary/20 bg-primary/5 p-6">
+            <div className="space-y-2">
+              <h3 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                AI Case Assessment
+                <span className="text-lg font-normal text-muted-foreground">
+                  (Score: {submittedIntake.aiScore}/100)
+                </span>
+              </h3>
+              {submittedIntake.aiSummary && (
+                <p className="text-foreground leading-relaxed">
+                  {submittedIntake.aiSummary}
+                </p>
+              )}
+            </div>
+
+            {/* Score Breakdown */}
+            {submittedIntake.aiScoreBreakdown && (
+              <div className="space-y-3">
+                <h4 className="text-lg font-semibold text-foreground">Score Breakdown</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="rounded-md bg-background/60 p-3 border border-border/40">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Legal Merit</span>
+                      <span className="text-sm font-bold">{submittedIntake.aiScoreBreakdown.legalMerit}/30</span>
+                    </div>
+                  </div>
+                  <div className="rounded-md bg-background/60 p-3 border border-border/40">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Evidence Quality</span>
+                      <span className="text-sm font-bold">{submittedIntake.aiScoreBreakdown.evidenceQuality}/20</span>
+                    </div>
+                  </div>
+                  <div className="rounded-md bg-background/60 p-3 border border-border/40">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Damages Potential</span>
+                      <span className="text-sm font-bold">{submittedIntake.aiScoreBreakdown.damagesPotential}/25</span>
+                    </div>
+                  </div>
+                  <div className="rounded-md bg-background/60 p-3 border border-border/40">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Procedural Viability</span>
+                      <span className="text-sm font-bold">{submittedIntake.aiScoreBreakdown.proceduralViability}/15</span>
+                    </div>
+                  </div>
+                  <div className="rounded-md bg-background/60 p-3 border border-border/40 md:col-span-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Likelihood of Success</span>
+                      <span className="text-sm font-bold">{submittedIntake.aiScoreBreakdown.likelihoodOfSuccess}/10</span>
+                    </div>
+                  </div>
+                </div>
+                {submittedIntake.aiScoreBreakdown.explanation && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {submittedIntake.aiScoreBreakdown.explanation}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Warnings */}
+            {submittedIntake.aiWarnings && submittedIntake.aiWarnings.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  ⚠️ Important Warnings
+                </h4>
+                <ul className="space-y-2">
+                  {submittedIntake.aiWarnings.map((warning, idx) => (
+                    <li key={idx} className="text-sm text-foreground bg-yellow-500/10 border border-yellow-500/30 rounded-md p-3">
+                      {warning}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Recommended Firms */}
+            {submittedIntake.recommendedFirms && submittedIntake.recommendedFirms.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="text-lg font-semibold text-foreground">Recommended Law Firms</h4>
+                <div className="space-y-3">
+                  {submittedIntake.recommendedFirms.map((firm, idx) => (
+                    <div key={idx} className="rounded-md bg-background/60 p-4 border border-border/40 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h5 className="font-semibold text-foreground">{firm.name}</h5>
+                          <p className="text-sm text-muted-foreground">{firm.location}</p>
+                        </div>
+                        {firm.website && (
+                          <a
+                            href={firm.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-primary hover:underline"
+                          >
+                            Visit Website →
+                          </a>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Practice Areas:</strong> {firm.practiceAreas.join(", ")}
+                      </p>
+                      <p className="text-sm text-foreground">{firm.reasoning}</p>
+                      <p className="text-xs text-muted-foreground">Source: {firm.source}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Applicable Laws */}
+            {submittedIntake.applicableLaws && submittedIntake.applicableLaws.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="text-lg font-semibold text-foreground">Applicable Laws</h4>
+                <div className="space-y-2">
+                  {submittedIntake.applicableLaws.map((law, idx) => (
+                    <div key={idx} className="rounded-md bg-background/60 p-3 border border-border/40">
+                      <p className="font-medium text-sm text-foreground">{law.statute}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{law.summary}</p>
+                      <p className="text-xs text-muted-foreground mt-1"><strong>Relevance:</strong> {law.relevance}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Full Reasoning */}
+            {submittedIntake.aiReasoning && (
+              <details className="space-y-2">
+                <summary className="text-lg font-semibold text-foreground cursor-pointer hover:text-primary">
+                  View Full Analysis
+                </summary>
+                <div className="mt-3 rounded-md bg-background/60 p-4 border border-border/40 text-sm text-foreground whitespace-pre-wrap">
+                  {submittedIntake.aiReasoning}
+                </div>
+              </details>
+            )}
+
+            <Button
+              onClick={() => setSubmittedIntake(null)}
+              variant="outline"
+              className="w-full"
+            >
+              File Another Intake
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

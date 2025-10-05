@@ -1,4 +1,5 @@
 from typing import AsyncIterator, Dict, List, Optional, Any
+import logging
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
@@ -10,10 +11,12 @@ from .chat_agents.orchestrator import stream_chat_py
 from .utils.prompt import ClientMessage
 from .rag_store import ensure_vector_store, upload_blobs, search_store, format_results_for_prompt
 from .utils.tools import stored_intake_retrieval_tool
+from .intake_analysis import analyze_intake
 from openai import OpenAI
 
 load_dotenv(".env")
 
+logger = logging.getLogger(__name__)
 client = OpenAI()
 
 app = FastAPI()
@@ -148,5 +151,44 @@ async def handle_chat_data(
     response = StreamingResponse(event_stream())
     response.headers["x-vercel-ai-data-stream"] = "v1"
     return response
+
+
+class IntakeAnalysisRequest(BaseModel):
+    name: str
+    email: str
+    phone: Optional[str] = None
+    matterType: str
+    description: str
+    location: Optional[str] = None
+    incidentDate: Optional[str] = None
+
+
+@app.post("/api/intakes/analyze")
+async def analyze_intake_submission(request: IntakeAnalysisRequest):
+    """
+    Analyze an intake submission using AI to assess case strength,
+    provide scoring, and recommend law firms.
+    """
+    logger.info("📋 Intake analysis requested for matter type: %s", request.matterType)
+    
+    intake_data = {
+        "name": request.name,
+        "email": request.email,
+        "phone": request.phone,
+        "matterType": request.matterType,
+        "description": request.description,
+        "location": request.location,
+        "incidentDate": request.incidentDate,
+    }
+    
+    # Run AI analysis (await the async function)
+    analysis = await analyze_intake(intake_data)
+    
+    logger.info("✅ Analysis completed with score: %d/100", analysis.get("score", 0))
+    
+    return {
+        "success": True,
+        "analysis": analysis
+    }
 
 
