@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Import the tool
-from api.utils.tools import stored_intake_retrieval
+# Import the actual callable function (not the tool wrapper)
+from api.utils.tools import retrieve_intakes_from_db
 
 def test_retrieval():
     print("=" * 80)
@@ -32,7 +32,7 @@ def test_retrieval():
     print("Test 1: Retrieve ALL intakes (no category filter)")
     print("-" * 80)
     try:
-        result = stored_intake_retrieval(category=None)
+        result = retrieve_intakes_from_db(category=None)
         print(f"Result type: {type(result)}")
         print(f"Result length: {len(str(result)) if result else 0} characters")
         print(f"Result preview: {str(result)[:500]}...")
@@ -47,7 +47,7 @@ def test_retrieval():
     print("Test 2: Retrieve EMPLOYMENT intakes only")
     print("-" * 80)
     try:
-        result = stored_intake_retrieval(category="employment")
+        result = retrieve_intakes_from_db(category="employment")
         print(f"Result type: {type(result)}")
         print(f"Result length: {len(str(result)) if result else 0} characters")
         print(f"Result preview: {str(result)[:500]}...")
@@ -62,7 +62,7 @@ def test_retrieval():
     print("Test 3: Retrieve PERSONAL INJURY intakes only")
     print("-" * 80)
     try:
-        result = stored_intake_retrieval(category="personal injury")
+        result = retrieve_intakes_from_db(category="personal injury")
         print(f"Result type: {type(result)}")
         print(f"Result length: {len(str(result)) if result else 0} characters")
         print(f"Result preview: {str(result)[:500]}...")

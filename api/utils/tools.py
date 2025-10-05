@@ -15,24 +15,19 @@ MatterType = Literal[
     "immigration law"
 ]
 
-@function_tool(name_override="stored_intake_retrieval")
-def stored_intake_retrieval(category: Optional[MatterType] = None) -> List[Dict[str, Any]]:
+
+def retrieve_intakes_from_db(category: Optional[MatterType] = None) -> List[Dict[str, Any]]:
     """
     Retrieve intake cases stored in the database.
+    
+    This is a regular callable function. Call it directly from tests or API endpoints.
+    For agent use, import `stored_intake_retrieval_tool` instead (see bottom of file).
 
-    Behavior:
-    - If `category` is provided, only cases within that practice area are returned
-      (valid values: "employment", "personal injury", "mass tort/class action",
-      "family law", "immigration law"). Matching is case-insensitive.
-    - If no `category` is provided, all intake cases are returned.
-
-    Usage in workflow:
-    - Call this function whenever the user asks to "analyze over the intake cases"
-      or requests review of "existing cases" without providing any new context.
-      In those situations, the intent is to work with already-stored data.
+    Args:
+        category: Optional matter type to filter by. If None, returns all intakes.
 
     Returns:
-        List of dictionaries, each representing one intake record from the database.
+        String representation of list of intake dictionaries from database.
     """
     logger.info("🔧 TOOL: stored_intake_retrieval | category=%s", category or "ALL")
     
@@ -44,10 +39,12 @@ def stored_intake_retrieval(category: Optional[MatterType] = None) -> List[Dict[
 
         if category is not None:
             normalized = category.lower()
-            query = "SELECT * FROM intakes WHERE LOWER(category) = %s ORDER BY submittedAt DESC;"
+            # Use "matterType" column (from Prisma schema) and quote it for case-sensitivity
+            query = 'SELECT * FROM intakes WHERE LOWER("matterType") = %s ORDER BY "submittedAt" DESC;'
             cursor.execute(query, (normalized,))
         else:
-            query = "SELECT * FROM intakes ORDER BY submittedAt DESC;"
+            # Quote column name for case-sensitivity in Postgres
+            query = 'SELECT * FROM intakes ORDER BY "submittedAt" DESC;'
             cursor.execute(query)
 
         intakes = cursor.fetchall()
@@ -59,5 +56,9 @@ def stored_intake_retrieval(category: Optional[MatterType] = None) -> List[Dict[
         return str(intakes)
 
     except Exception as e:
-        logger.error("❌ Database error in stored_intake_retrieval: %s", str(e), exc_info=True)
+        logger.error("❌ Database error in retrieve_intakes_from_db: %s", str(e), exc_info=True)
         return []
+
+# Create tool wrapper for agents - this is what gets passed to Agent(..., tools=[...])
+stored_intake_retrieval_tool = function_tool(retrieve_intakes_from_db)
+

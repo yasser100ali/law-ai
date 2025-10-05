@@ -16,7 +16,7 @@ from .plaintiff_agent import plaintiffAgent
 from .lawyer_agent import lawyerAgent
 
 # tools 
-from ..utils.tools import stored_intake_retrieval
+from ..utils.tools import stored_intake_retrieval_tool
 
 
 load_dotenv()
@@ -354,7 +354,7 @@ async def stream_chat_py(
             WebSearchTool(),
             plaintiffAgent,
             lawyerAgent,
-            stored_intake_retrieval
+            stored_intake_retrieval_tool
         ]
     )
 
