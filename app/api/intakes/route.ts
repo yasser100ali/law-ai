@@ -56,9 +56,14 @@ export async function POST(request: Request) {
     let analysis = null;
     try {
       console.log("Calling Python backend for AI analysis...");
-      const pythonBackendUrl = process.env.PYTHON_BACKEND_URL || "http://127.0.0.1:8000";
       
-      const analysisResponse = await fetch(`${pythonBackendUrl}/api/intakes/analyze`, {
+      // In production on Vercel, use the deployment URL
+      // In development, use localhost
+      const baseUrl = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://127.0.0.1:8000";
+      
+      const analysisResponse = await fetch(`${baseUrl}/api/intakes/analyze`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
