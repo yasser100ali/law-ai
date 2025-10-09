@@ -1,5 +1,7 @@
 from typing import AsyncIterator, Dict, List, Optional, Any
 import logging
+import psycopg2
+import psycopg2.extras
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
@@ -190,5 +192,185 @@ async def analyze_intake_submission(request: IntakeAnalysisRequest):
         "success": True,
         "analysis": analysis
     }
+
+
+# Database connection helper
+def get_db_connection():
+    """Get a database connection using the DATABASE_URL environment variable"""
+    import os
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL environment variable not set")
+    return psycopg2.connect(DATABASE_URL)
+
+
+class IntakeCreateRequest(BaseModel):
+    shareWithMarketplace: bool
+    form: Dict[str, Any]
+
+
+@app.get("/api/intakes")
+async def get_intakes():
+    """Get all intakes from database"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        cursor.execute('SELECT * FROM intakes ORDER BY "submittedAt" DESC')
+        intakes = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        # Transform to match frontend expectations
+        transformed_intakes = []
+        for intake in intakes:
+            transformed = {
+                "id": intake["id"],
+                "submittedAt": intake["submittedAt"].isoformat() if intake.get("submittedAt") else None,
+                "shareWithMarketplace": intake.get("shareWithMarketplace", False),
+                "form": {
+                    "fullName": intake.get("fullName"),
+                    "email": intake.get("email"),
+                    "phone": intake.get("phone"),
+                    "jurisdiction": intake.get("jurisdiction"),
+                    "matterType": intake.get("matterType"),
+                    "summary": intake.get("summary"),
+                    "goals": intake.get("goals"),
+                    "urgency": intake.get("urgency"),
+                },
+                "aiSummary": intake.get("aiSummary"),
+                "aiScore": intake.get("aiScore"),
+                "aiScoreBreakdown": intake.get("aiScoreBreakdown"),
+                "aiReasoning": intake.get("aiReasoning"),
+                "aiWarnings": intake.get("aiWarnings"),
+                "recommendedFirms": intake.get("recommendedFirms"),
+                "applicableLaws": intake.get("applicableLaws"),
+            }
+            transformed_intakes.append(transformed)
+        
+        return transformed_intakes
+        
+    except Exception as e:
+        logger.error("Error fetching intakes: %s", str(e), exc_info=True)
+        return {"error": "Failed to fetch intakes"}, 500
+
+
+@app.post("/api/intakes")
+async def create_intake(request: IntakeCreateRequest):
+    """Create a new intake with AI analysis"""
+    try:
+        form = request.form
+        
+        # Run AI analysis
+        analysis = None
+        try:
+            logger.info("Running AI analysis for intake...")
+            analysis = await analyze_intake({
+                "name": form.get("fullName"),
+                "email": form.get("email"),
+                "phone": form.get("phone"),
+                "matterType": form.get("matterType"),
+                "description": f"{form.get('summary', '')}\n\nGoals: {form.get('goals', '')}\n\nUrgency: {form.get('urgency', '')}",
+                "location": form.get("jurisdiction"),
+                "incidentDate": None,
+            })
+            logger.info("AI analysis completed, score: %s", analysis.get("score") if analysis else "N/A")
+        except Exception as e:
+            logger.error("AI analysis failed: %s", str(e), exc_info=True)
+        
+        # Insert into database
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        cursor.execute('''
+            INSERT INTO intakes (
+                "shareWithMarketplace", "fullName", email, phone, jurisdiction, 
+                "matterType", summary, goals, urgency,
+                "aiSummary", "aiScore", "aiScoreBreakdown", "aiReasoning",
+                "aiWarnings", "recommendedFirms", "applicableLaws"
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+            ) RETURNING *
+        ''', (
+            request.shareWithMarketplace,
+            form.get("fullName"),
+            form.get("email"),
+            form.get("phone"),
+            form.get("jurisdiction"),
+            form.get("matterType"),
+            form.get("summary"),
+            form.get("goals"),
+            form.get("urgency"),
+            analysis.get("summary") if analysis else None,
+            analysis.get("score") if analysis else None,
+            psycopg2.extras.Json(analysis.get("scoreBreakdown")) if analysis and analysis.get("scoreBreakdown") else None,
+            analysis.get("reasoning") if analysis else None,
+            psycopg2.extras.Json(analysis.get("warnings")) if analysis and analysis.get("warnings") else None,
+            psycopg2.extras.Json(analysis.get("recommendedFirms")) if analysis and analysis.get("recommendedFirms") else None,
+            psycopg2.extras.Json(analysis.get("applicableLaws")) if analysis and analysis.get("applicableLaws") else None,
+        ))
+        
+        intake = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        # Transform response
+        transformed = {
+            "id": intake["id"],
+            "submittedAt": intake["submittedAt"].isoformat() if intake.get("submittedAt") else None,
+            "shareWithMarketplace": intake.get("shareWithMarketplace", False),
+            "form": {
+                "fullName": intake.get("fullName"),
+                "email": intake.get("email"),
+                "phone": intake.get("phone"),
+                "jurisdiction": intake.get("jurisdiction"),
+                "matterType": intake.get("matterType"),
+                "summary": intake.get("summary"),
+                "goals": intake.get("goals"),
+                "urgency": intake.get("urgency"),
+            },
+            "aiSummary": intake.get("aiSummary"),
+            "aiScore": intake.get("aiScore"),
+            "aiScoreBreakdown": intake.get("aiScoreBreakdown"),
+            "aiReasoning": intake.get("aiReasoning"),
+            "aiWarnings": intake.get("aiWarnings"),
+            "recommendedFirms": intake.get("recommendedFirms"),
+            "applicableLaws": intake.get("applicableLaws"),
+        }
+        
+        return transformed
+        
+    except Exception as e:
+        logger.error("Error creating intake: %s", str(e), exc_info=True)
+        return {"error": "Failed to create intake"}, 500
+
+
+@app.delete("/api/intakes/{intake_id}")
+async def delete_intake(intake_id: str):
+    """Delete an intake by ID"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Check if exists
+        cursor.execute('SELECT id FROM intakes WHERE id = %s', (intake_id,))
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return {"error": "Intake not found"}, 404
+        
+        # Delete
+        cursor.execute('DELETE FROM intakes WHERE id = %s', (intake_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return {"success": True}
+        
+    except Exception as e:
+        logger.error("Error deleting intake: %s", str(e), exc_info=True)
+        return {"error": "Failed to delete intake"}, 500
 
 
