@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import type { Intake } from "@prisma/client";
+//import type { Intake } from "@prisma/client";
 
 // GET /api/intakes - Fetch all intakes
 export async function GET() {
@@ -59,9 +59,9 @@ export async function POST(request: Request) {
       
       // In production on Vercel, use the deployment URL
       // In development, use localhost
-      const baseUrl = process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://127.0.0.1:8000";
+      const baseUrl = process.env.NODE_ENV === "development" 
+      ? "http://127.0.0.1:8000"
+      : "";
       
       const analysisResponse = await fetch(`${baseUrl}/api/intakes/analyze`, {
         method: "POST",

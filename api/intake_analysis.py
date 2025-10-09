@@ -231,35 +231,69 @@ OUTPUT: Always return valid JSON matching the requested structure.
         # Try to parse as JSON, fall back to structured parsing if needed
         import json
         import re
-        
-        # Extract JSON from markdown code blocks if present
-        json_match = re.search(r'```(?:json)?\s*(\{.*\})\s*```', result_text, re.DOTALL)
+
+        # Log the raw result for debugging
+        logger.info("Raw AI response (first 1000 chars): %s", result_text[:1000])
+
+        # Extract JSON from various possible formats
+        json_str = result_text.strip()
+
+        # Method 1: Look for JSON in markdown code blocks
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', json_str, re.DOTALL)
         if json_match:
             json_str = json_match.group(1)
+            logger.info("Found JSON in markdown code block")
         else:
-            json_str = result_text
-        
+            # Method 2: Look for JSON object directly
+            json_match = re.search(r'(\{.*\})', json_str, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(1)
+                logger.info("Found JSON object directly")
+
+        # Clean up the JSON string
+        json_str = json_str.strip()
+        # Remove any trailing commas before closing braces/brackets
+        json_str = re.sub(r',(\s*[}\]])', r'\1', json_str)
+        # Fix common JSON formatting issues
+        json_str = json_str.replace('```', '').replace('`', '')
+
+        logger.info("Cleaned JSON string (first 500 chars): %s", json_str[:500])
+
         try:
             analysis = json.loads(json_str)
-        except json.JSONDecodeError:
-            logger.warning("Failed to parse JSON response, using fallback structure")
-            # Fallback structure
-            analysis = {
-                "summary": "Analysis completed. See full reasoning for details.",
-                "score": 50,
-                "scoreBreakdown": {
-                    "legalMerit": 15,
-                    "evidenceQuality": 10,
-                    "damagesPotential": 12,
-                    "proceduralViability": 8,
-                    "likelihoodOfSuccess": 5,
-                    "explanation": "Unable to parse detailed breakdown"
-                },
-                "reasoning": result_text,
-                "warnings": [],
-                "recommendedFirms": [],
-                "applicableLaws": []
-            }
+            logger.info("✅ Successfully parsed JSON response")
+        except json.JSONDecodeError as e:
+            logger.warning("❌ Failed to parse JSON response: %s", str(e))
+            logger.warning("Attempting to fix common JSON issues...")
+
+            # Try to fix common JSON issues
+            try:
+                # Remove trailing commas
+                json_str = re.sub(r',\s*([}\]])', r'\1', json_str)
+                # Fix unescaped quotes in strings (basic fix)
+                json_str = re.sub(r'([^\\])"', r'\1\"', json_str)
+                analysis = json.loads(json_str)
+                logger.info("✅ Successfully parsed JSON after cleanup")
+            except json.JSONDecodeError as e2:
+                logger.warning("❌ Still failed to parse JSON after cleanup: %s", str(e2))
+                logger.warning("Using fallback structure")
+                # Fallback structure
+                analysis = {
+                    "summary": "Analysis completed. See full reasoning for details.",
+                    "score": 50,
+                    "scoreBreakdown": {
+                        "legalMerit": 15,
+                        "evidenceQuality": 10,
+                        "damagesPotential": 12,
+                        "proceduralViability": 8,
+                        "likelihoodOfSuccess": 5,
+                        "explanation": f"JSON parsing failed: {str(e)}"
+                    },
+                    "reasoning": result_text,
+                    "warnings": [],
+                    "recommendedFirms": [],
+                    "applicableLaws": []
+                }
         
         logger.info("📊 Analysis Score: %d/100", analysis.get("score", 0))
         return analysis
