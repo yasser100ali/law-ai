@@ -149,3 +149,43 @@ export async function POST(request: Request) {
   }
 }
 
+// DELETE /api/intakes?id={id} - Delete an intake
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Intake ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if intake exists
+    const existingIntake = await prisma.intake.findUnique({
+      where: { id },
+    });
+
+    if (!existingIntake) {
+      return NextResponse.json(
+        { error: "Intake not found" },
+        { status: 404 }
+      );
+    }
+
+    // Delete the intake
+    await prisma.intake.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting intake:", error);
+    return NextResponse.json(
+      { error: "Failed to delete intake" },
+      { status: 500 }
+    );
+  }
+}
+

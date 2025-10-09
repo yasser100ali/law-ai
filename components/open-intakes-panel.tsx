@@ -62,7 +62,7 @@ function OpenIntakesPanel({
     setDeletingIds((prev) => new Set(prev).add(id));
 
     try {
-      const response = await fetch(`/api/intakes/${id}`, {
+      const response = await fetch(`/api/intakes?id=${id}`, {
         method: "DELETE",
       });
 
