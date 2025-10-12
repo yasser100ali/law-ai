@@ -17,8 +17,8 @@ function OpenIntakesPanel({
   const matterTypes = React.useMemo(() => {
     const unique = new Set<string>();
     records.forEach((record) => {
-      const trimmed = record.form.matterType.trim();
-      if (trimmed.length > 0) {
+      const trimmed = record?.form?.matterType?.trim();
+      if (trimmed && trimmed.length > 0) {
         unique.add(trimmed);
       }
     });
@@ -26,12 +26,12 @@ function OpenIntakesPanel({
   }, [records]);
 
   const filteredRecords = React.useMemo(() => {
-    let filtered = records;
+    let filtered = records.filter(record => record && record.form); // Remove invalid records
     
     // Apply matter type filter
     if (matterFilter !== "All") {
-      filtered = records.filter(
-        (record) => record.form.matterType.trim() === matterFilter,
+      filtered = filtered.filter(
+        (record) => record?.form?.matterType?.trim() === matterFilter,
       );
     }
 
@@ -39,13 +39,13 @@ function OpenIntakesPanel({
     const sorted = [...filtered];
     if (sortBy === "score") {
       sorted.sort((a, b) => {
-        const scoreA = a.aiScore ?? -1;
-        const scoreB = b.aiScore ?? -1;
+        const scoreA = a?.aiScore ?? -1;
+        const scoreB = b?.aiScore ?? -1;
         return scoreB - scoreA; // Highest score first
       });
     } else {
       sorted.sort((a, b) => {
-        return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
+        return new Date(b?.submittedAt || 0).getTime() - new Date(a?.submittedAt || 0).getTime();
       });
     }
 
@@ -156,8 +156,10 @@ function OpenIntakesPanel({
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredRecords.map((record) => {
-              const submittedDate = new Date(record.submittedAt);
+            {filteredRecords
+              .filter(record => record && record.id && record.form) // Extra safety
+              .map((record) => {
+              const submittedDate = new Date(record?.submittedAt || Date.now());
               const formattedDate = submittedDate.toLocaleString(undefined, {
                 year: "numeric",
                 month: "short",
@@ -168,7 +170,7 @@ function OpenIntakesPanel({
 
               return (
                 <motion.div
-                  key={record.id}
+                  key={record?.id || Math.random()}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2 }}
@@ -178,9 +180,9 @@ function OpenIntakesPanel({
                     <div className="flex-1">
                       <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="text-xl font-semibold text-foreground">
-                          {record.form.fullName || "Anonymous claimant"}
+                          {record?.form?.fullName || "Anonymous claimant"}
                         </h3>
-                        {record.aiScore !== undefined && (
+                        {record?.aiScore !== undefined && (
                           <span className={`rounded-full px-3 py-1 text-xs font-bold ${
                             record.aiScore >= 70 
                               ? "bg-green-500/20 text-green-600 border border-green-500/40" 
@@ -194,18 +196,18 @@ function OpenIntakesPanel({
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {formattedDate}
-                        {record.form.jurisdiction && ` · ${record.form.jurisdiction}`}
+                        {record?.form?.jurisdiction && ` · ${record.form.jurisdiction}`}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2 items-start">
                       <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                        {record.form.matterType && (
+                        {record?.form?.matterType && (
                           <span className="rounded-full border border-border/60 px-3 py-1 text-foreground">
                             {record.form.matterType}
                           </span>
                         )}
                         <span className="rounded-full border border-border/60 px-3 py-1">
-                          {record.shareWithMarketplace
+                          {record?.shareWithMarketplace
                             ? "Opted into marketplace"
                             : "Private intake"}
                         </span>
@@ -213,11 +215,11 @@ function OpenIntakesPanel({
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleDelete(record.id)}
-                        disabled={deletingIds.has(record.id)}
+                        onClick={() => handleDelete(record?.id || "")}
+                        disabled={deletingIds.has(record?.id || "")}
                         className="h-7 px-3 text-xs"
                       >
-                        {deletingIds.has(record.id) ? "Deleting..." : "Delete"}
+                        {deletingIds.has(record?.id || "") ? "Deleting..." : "Delete"}
                       </Button>
                     </div>
                   </div>
@@ -226,11 +228,11 @@ function OpenIntakesPanel({
                     <div>
                       <p className="font-medium text-foreground">Summary</p>
                       <p className="text-muted-foreground whitespace-pre-line">
-                        {record.form.summary || "No summary provided."}
+                        {record?.form?.summary || "No summary provided."}
                       </p>
                     </div>
 
-                    {record.form.goals && (
+                    {record?.form?.goals && (
                       <div>
                         <p className="font-medium text-foreground">Desired outcome</p>
                         <p className="text-muted-foreground whitespace-pre-line">
@@ -239,7 +241,7 @@ function OpenIntakesPanel({
                       </div>
                     )}
 
-                    {record.form.urgency && (
+                    {record?.form?.urgency && (
                       <div>
                         <p className="font-medium text-foreground">Urgency notes</p>
                         <p className="text-muted-foreground whitespace-pre-line">
@@ -250,30 +252,30 @@ function OpenIntakesPanel({
 
                     <div className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex flex-col">
-                        {record.form.email && (
+                        {record?.form?.email && (
                           <span>
                             <span className="font-medium text-foreground/80">Email:</span> {record.form.email}
                           </span>
                         )}
-                        {record.form.phone && (
+                        {record?.form?.phone && (
                           <span>
                             <span className="font-medium text-foreground/80">Phone:</span> {record.form.phone}
                           </span>
                         )}
                       </div>
                       <span>
-                        Intake ID: <code className="text-foreground/80">{record.id}</code>
+                        Intake ID: <code className="text-foreground/80">{record?.id || "N/A"}</code>
                       </span>
                     </div>
 
                     {/* AI Analysis Section */}
-                    {record.aiScore !== undefined && (
+                    {record?.aiScore !== undefined && (
                       <details className="mt-4 rounded-md border border-primary/30 bg-primary/5">
                         <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground hover:text-primary">
                           📊 View AI Analysis & Recommendations
                         </summary>
                         <div className="space-y-4 px-4 pb-4 pt-2">
-                          {record.aiSummary && (
+                          {record?.aiSummary && (
                             <div>
                               <p className="font-medium text-foreground text-sm">AI Summary</p>
                               <p className="text-sm text-muted-foreground mt-1">
@@ -282,31 +284,31 @@ function OpenIntakesPanel({
                             </div>
                           )}
 
-                          {record.aiScoreBreakdown && (
+                          {record?.aiScoreBreakdown && (
                             <div>
                               <p className="font-medium text-foreground text-sm mb-2">Score Breakdown</p>
                               <div className="grid grid-cols-2 gap-2 text-xs">
                                 <div className="flex justify-between bg-background/60 rounded px-2 py-1">
                                   <span>Legal Merit:</span>
-                                  <span className="font-bold">{record.aiScoreBreakdown.legalMerit}/30</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown?.legalMerit || 0}/30</span>
                                 </div>
                                 <div className="flex justify-between bg-background/60 rounded px-2 py-1">
                                   <span>Evidence:</span>
-                                  <span className="font-bold">{record.aiScoreBreakdown.evidenceQuality}/20</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown?.evidenceQuality || 0}/20</span>
                                 </div>
                                 <div className="flex justify-between bg-background/60 rounded px-2 py-1">
                                   <span>Damages:</span>
-                                  <span className="font-bold">{record.aiScoreBreakdown.damagesPotential}/25</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown?.damagesPotential || 0}/25</span>
                                 </div>
                                 <div className="flex justify-between bg-background/60 rounded px-2 py-1">
                                   <span>Procedural:</span>
-                                  <span className="font-bold">{record.aiScoreBreakdown.proceduralViability}/15</span>
+                                  <span className="font-bold">{record.aiScoreBreakdown?.proceduralViability || 0}/15</span>
                                 </div>
                               </div>
                             </div>
                           )}
 
-                          {record.aiWarnings && record.aiWarnings.length > 0 && (
+                          {record?.aiWarnings && record.aiWarnings.length > 0 && (
                             <div>
                               <p className="font-medium text-foreground text-sm mb-2">⚠️ Warnings</p>
                               <ul className="space-y-1 text-xs">
@@ -319,7 +321,7 @@ function OpenIntakesPanel({
                             </div>
                           )}
 
-                          {record.recommendedFirms && record.recommendedFirms.length > 0 && (
+                          {record?.recommendedFirms && record.recommendedFirms.length > 0 && (
                             <div>
                               <p className="font-medium text-foreground text-sm mb-2">Recommended Firms ({record.recommendedFirms.length})</p>
                               <div className="text-xs text-muted-foreground">

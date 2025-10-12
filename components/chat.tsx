@@ -67,19 +67,29 @@ export function Chat() {
         const response = await fetch(`${backendUrl}/api/intakes`);
         if (response.ok) {
           const intakes = await response.json();
-          setIntakeRecords(intakes);
+          console.log("Loaded intakes:", intakes); // Debug log
+          // Validate data
+          if (Array.isArray(intakes)) {
+            const validIntakes = intakes.filter(intake => intake && intake.form);
+            setIntakeRecords(validIntakes);
+          } else {
+            console.warn("Intakes data is not an array:", intakes);
+            setIntakeRecords([]);
+          }
         } else {
-          console.error("Failed to load intakes");
+          console.error("Failed to load intakes:", response.status);
+          setIntakeRecords([]);
         }
       } catch (error) {
         console.error("Error loading intakes:", error);
+        setIntakeRecords([]);
       } finally {
         setIsLoadingIntakes(false);
       }
     };
 
     loadIntakes();
-  }, []);
+  }, [backendUrl]); // Add backendUrl dependency
 
   const openPanel = React.useCallback(
     (

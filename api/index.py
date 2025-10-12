@@ -8,6 +8,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from cuid import cuid
 
 from .chat_agents.orchestrator import stream_chat_py
 from .utils.prompt import ClientMessage
@@ -283,16 +284,21 @@ async def create_intake(request: IntakeCreateRequest):
         conn = get_db_connection()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
+        # Generate ID before insert
+        intake_id = cuid()
+        
         cursor.execute('''
             INSERT INTO intakes (
-                "shareWithMarketplace", "fullName", email, phone, jurisdiction, 
+                id, "shareWithMarketplace", "fullName", email, phone, jurisdiction, 
                 "matterType", summary, goals, urgency,
+                "submittedAt", "createdAt", "updatedAt",
                 "aiSummary", "aiScore", "aiScoreBreakdown", "aiReasoning",
                 "aiWarnings", "recommendedFirms", "applicableLaws"
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s
             ) RETURNING *
         ''', (
+            intake_id,
             request.shareWithMarketplace,
             form.get("fullName"),
             form.get("email"),
