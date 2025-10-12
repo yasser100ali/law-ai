@@ -37,12 +37,16 @@ function IntakePanel({
     };
   };
 
+  const backendUrl = process.env.NODE_ENV === "development" 
+    ? "http://127.0.0.1:8000"
+    : process.env.RAILWAY_URL;
+
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/intakes", {
+      const response = await fetch(`${backendUrl}/api/intakes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

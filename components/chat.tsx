@@ -22,6 +22,10 @@ import { IntakeRecord } from "@/types/intake";
 export function Chat() {
   const chatId = "001";
 
+  const backendUrl = process.env.NODE_ENV === "development" 
+    ? "http://127.0.0.1:8000"
+    : process.env.RAILWAY_URL;
+
   const {
     messages,
     setMessages,
@@ -32,6 +36,7 @@ export function Chat() {
     isLoading,
     stop,
   } = useChat({
+    api: `${backendUrl}/api/chat`,
     maxSteps: 4,
     onError: (error: Error) => {
       if (error.message.includes("Too many requests")) {
@@ -59,7 +64,7 @@ export function Chat() {
     const loadIntakes = async () => {
       setIsLoadingIntakes(true);
       try {
-        const response = await fetch("/api/intakes");
+        const response = await fetch(`${backendUrl}/api/intakes`);
         if (response.ok) {
           const intakes = await response.json();
           setIntakeRecords(intakes);

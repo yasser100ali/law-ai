@@ -54,6 +54,10 @@ function OpenIntakesPanel({
 
   const [deletingIds, setDeletingIds] = React.useState<Set<string>>(new Set());
 
+  const backendUrl = process.env.NODE_ENV === "development" 
+    ? "http://127.0.0.1:8000"
+    : process.env.RAILWAY_URL;
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this intake? This action cannot be undone.")) {
       return;
@@ -62,7 +66,7 @@ function OpenIntakesPanel({
     setDeletingIds((prev) => new Set(prev).add(id));
 
     try {
-      const response = await fetch(`/api/intakes?id=${id}`, {
+      const response = await fetch(`${backendUrl}/api/intakes?id=${id}`, {
         method: "DELETE",
       });
 
