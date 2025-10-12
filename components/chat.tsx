@@ -24,7 +24,7 @@ export function Chat() {
 
   const backendUrl = process.env.NODE_ENV === "development" 
     ? "http://127.0.0.1:8000"
-    : process.env.RAILWAY_URL;
+    : process.env.NEXT_PUBLIC_RAILWAY_URL || "https://law-ai-production-01cd.up.railway.app";
 
   const {
     messages,
