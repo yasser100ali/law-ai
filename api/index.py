@@ -353,22 +353,22 @@ async def create_intake(request: IntakeCreateRequest):
         return {"error": "Failed to create intake"}, 500
 
 
-@app.delete("/api/intakes/{intake_id}")
-async def delete_intake(intake_id: str):
+@app.delete("/api/intakes")
+async def delete_intake(id: str = Query(...)):
     """Delete an intake by ID"""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
         # Check if exists
-        cursor.execute('SELECT id FROM intakes WHERE id = %s', (intake_id,))
+        cursor.execute('SELECT id FROM intakes WHERE id = %s', (id,))
         if not cursor.fetchone():
             cursor.close()
             conn.close()
             return {"error": "Intake not found"}, 404
         
         # Delete
-        cursor.execute('DELETE FROM intakes WHERE id = %s', (intake_id,))
+        cursor.execute('DELETE FROM intakes WHERE id = %s', (id,))
         conn.commit()
         cursor.close()
         conn.close()
