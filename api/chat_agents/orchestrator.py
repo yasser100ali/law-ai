@@ -224,10 +224,21 @@ async def stream_chat_py(
 
 
     
-    instructions = """
+    # Adjust instructions based on mode
+    mode_context = ""
+    if selected_chat_mode == "lawyer":
+        mode_context = """
+    IMPORTANT: The user has identified as a LAWYER. Always route to the lawyerAgent.
+    The user has access to intake rankings and wants to research cases, analyze intakes, and get insights.
+    Use the stored_intake_retrieval_tool to access intake data when asked about intakes.
+    """
+    
+    instructions = f"""
     You are part of a full-stack demo built by AI Engineer **Yasser Ali** (Next.js frontend, FastAPI+Python backend). 
     This project showcases two legal AI agents (for plaintiffs and for lawyers) under a single orchestrator, plus a Q&A 
     about Yasser's background. The company audience is **Eve**, a startup building AI to help lawyers work faster.
+
+    {mode_context}
 
     ──────────────────────────────────────────────────────────────────────────────
     SYSTEM GOALS

@@ -13,8 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { WhyHireMePanel } from "@/components/why-hire-panel";
-import { EveIdeasPanel } from "@/components/eve-ideas-panel";
 import { IntakePanel } from "@/components/intake-panel";
 import { OpenIntakesPanel } from "@/components/open-intakes-panel";
 import { IntakeRecord } from "@/types/intake";
@@ -48,7 +46,7 @@ export function Chat() {
   });
 
   const [splitScreenMode, setSplitScreenMode] = React.useState<
-    "none" | "whyhire" | "eveideas" | "intake" | "openIntakes"
+    "none" | "intake" | "openIntakes"
   >("none");
   const [panelVisible, setPanelVisible] = React.useState(false);
   const rightPanelRef = React.useRef<HTMLDivElement | null>(null);
@@ -93,7 +91,7 @@ export function Chat() {
 
   const openPanel = React.useCallback(
     (
-      mode: "whyhire" | "eveideas" | "intake" | "openIntakes",
+      mode: "intake" | "openIntakes",
       { ensureVisible = true }: { ensureVisible?: boolean } = {},
     ) => {
       setSplitScreenMode(mode);
@@ -103,14 +101,6 @@ export function Chat() {
     },
     [],
   );
-
-  const handleWhyHireMe = () => {
-    openPanel("whyhire");
-  };
-
-  const handleEveIdeas = () => {
-    openPanel("eveideas");
-  };
 
   const handleIntake = () => {
     openPanel("intake");
@@ -180,7 +170,7 @@ export function Chat() {
                     </p>
                   </motion.div>
                   <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.3 }}
@@ -201,22 +191,6 @@ export function Chat() {
                     >
                       File an intake
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full h-auto px-3 py-2.5 text-xs sm:text-sm font-semibold whitespace-normal leading-snug"
-                      onClick={handleWhyHireMe}
-                    >
-                      Why hire me?
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full h-auto px-3 py-2.5 text-xs sm:text-sm font-semibold whitespace-normal leading-snug"
-                      onClick={handleEveIdeas}
-                    >
-                      How Eve can dominate Legal AI
-                    </Button>
                   </motion.div>
                 </div>
               </div>
@@ -230,8 +204,6 @@ export function Chat() {
             {/* Show overview centered when no messages */}
             {!hasMessages && (
               <Overview
-                onWhyHireMe={handleWhyHireMe}
-                onEveIdeas={handleEveIdeas}
                 onIntake={handleIntake}
                 onOpenIntakes={handleOpenIntakes}
               />
@@ -327,14 +299,12 @@ export function Chat() {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {splitScreenMode === "whyhire" && <WhyHireMePanel />}
-            {splitScreenMode === "eveideas" && <EveIdeasPanel />}
             {splitScreenMode === "intake" && (
               <IntakePanel onIntakeSubmitted={handleIntakeSubmitted} />
             )}
             {splitScreenMode === "openIntakes" && (
-              <OpenIntakesPanel 
-                records={intakeRecords} 
+              <OpenIntakesPanel
+                records={intakeRecords}
                 onDeleteIntake={handleDeleteIntake}
               />
             )}

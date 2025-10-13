@@ -3,15 +3,11 @@ import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 
 interface OverviewProps {
-  onWhyHireMe: () => void;
-  onEveIdeas: () => void;
   onIntake: () => void;
   onOpenIntakes: () => void;
 }
 
 export const Overview = ({
-  onWhyHireMe,
-  onEveIdeas,
   onIntake,
   onOpenIntakes,
 }: OverviewProps) => {
@@ -33,10 +29,10 @@ export const Overview = ({
         <div className="flex flex-col items-center gap-4 sm:gap-5 lg:gap-6 text-center">
           {/* Title */}
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight font-space-grotesk text-white leading-[1.1]">
+            <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight text-white leading-[1.1]">
               Atlas AI
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-lg font-light font-space-grotesk tracking-wide">
+            <p className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-lg font-light tracking-wide">
               by <span className="text-white font-normal">Yasser Ali</span>
             </p>
           </div>
@@ -45,7 +41,7 @@ export const Overview = ({
           <div className="w-16 h-px bg-white/20" />
 
           {/* Tagline */}
-          <p className="text-muted-foreground text-xs sm:text-sm md:text-sm lg:text-base max-w-2xl leading-relaxed font-space-grotesk tracking-wide">
+          <p className="text-muted-foreground text-xs sm:text-sm md:text-sm lg:text-base max-w-2xl leading-relaxed tracking-wide">
             Production-grade multi-agent AI systems for legal tech
           </p>
 
@@ -54,23 +50,7 @@ export const Overview = ({
             <Button
               size="lg"
               variant="outline"
-              className="w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-5 lg:py-3.5 text-xs sm:text-sm lg:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
-              onClick={onWhyHireMe}
-            >
-              Why hire me?
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-5 lg:py-3.5 text-xs sm:text-sm lg:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
-              onClick={onEveIdeas}
-            >
-              How Eve can dominate Legal AI
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-5 lg:py-3.5 text-xs sm:text-sm lg:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-5 lg:py-3.5 text-xs sm:text-sm lg:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 tracking-wide text-white"
               onClick={onIntake}
             >
               File an intake
@@ -78,7 +58,7 @@ export const Overview = ({
             <Button
               size="lg"
               variant="outline"
-              className="w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-5 lg:py-3.5 text-xs sm:text-sm lg:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 font-space-grotesk tracking-wide text-white"
+              className="w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-5 lg:py-3.5 text-xs sm:text-sm lg:text-base font-medium border-2 border-white/30 hover:border-white hover:bg-white hover:text-black transition-all duration-200 tracking-wide text-white"
               onClick={onOpenIntakes}
             >
               Open intakes

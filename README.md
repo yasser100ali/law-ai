@@ -3,6 +3,32 @@ Atlas
 
 Atlas is a legal AI platform designed to speed up the process of filing an intake and finding the right lawyer. It acts as a bridge between plaintiffs and law firms by providing intelligent intake analysis, legal triage, and two-sided argument preparation.
 
+## Getting Started
+
+When you launch Atlas, you'll be prompted to select your role:
+
+- **Plaintiff/Claimant** - File an intake or get legal assistance
+- **Lawyer/Attorney** - Review intakes and research cases
+
+### Plaintiff Interface
+Accessible at `/plaintiff`, this interface provides:
+- Conversational AI assistant for legal guidance
+- Intake form submission and case analysis
+- Access to view submitted intakes
+
+### Lawyer Interface
+Accessible at `/lawyer`, this interface provides:
+- **Left Panel**: Ranked intake list with AI scoring
+  - Filter by matter type
+  - Sort by score or date
+  - View detailed score breakdowns
+  - Quick access to intake details
+- **Right Panel**: AI research assistant
+  - Ask questions about intakes
+  - Analyze patterns across cases
+  - Research legal issues
+  - Access intake database via natural language
+
 AI-Powered Legal Triage – MVP (V1)
 ----------------------------------
 
