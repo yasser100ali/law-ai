@@ -1,6 +1,9 @@
 from agents import Agent, Runner, WebSearchTool, function_tool
 from dotenv import load_dotenv
 import logging
+import os 
+
+
 
 load_dotenv()
 
@@ -89,6 +92,8 @@ def plaintiffAgent(query: str) -> str:
     Returns:
         Agent response with case analysis and recommendations
     """
+    
+
 
     agent = Agent(
         name="plaintiff-agent",

@@ -97,6 +97,8 @@ def lawyerAgent(query: str) -> str:
     Returns:
         Agent response with legal analysis and recommendations
     """
+
+
     agent = Agent(
         name="lawyer-agent",
         model="gpt-4.1",

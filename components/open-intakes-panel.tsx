@@ -56,7 +56,7 @@ function OpenIntakesPanel({
 
   const backendUrl = process.env.NODE_ENV === "development" 
     ? "http://127.0.0.1:8000"
-    : process.env.NEXT_PUBLIC_RAILWAY_URL || "https://law-ai-production-01cd.up.railway.app";
+    : process.env.RAILWAY_URL || "https://law-ai-production-01cd.up.railway.app";
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this intake? This action cannot be undone.")) {
