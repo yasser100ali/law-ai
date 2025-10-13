@@ -348,7 +348,7 @@ async def stream_chat_py(
 
     OUTPUT MODES
     - Markdown by default. Offer an optional **JSON block** with fields:
-    {mode, jurisdiction, facts_snapshot, claims, elements_map, case_strength_score, risks, deadlines, recommendation, sources}.
+    mode, jurisdiction, facts_snapshot, claims, elements_map, case_strength_score, risks, deadlines, recommendation, sources.
 
     REMINDERS
     - Never present legal specifics without citations. 

@@ -42,40 +42,66 @@ export default function LandingPage() {
           </p>
 
           {/* Role Selection */}
-          <div className="mt-8 flex flex-col gap-4 w-full max-w-md">
-            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">
-              I am a...
+          <div className="mt-10 flex flex-col gap-3 w-full max-w-lg">
+            <h2 className="text-base font-medium text-zinc-400 mb-1 tracking-wide">
+              Select your role
             </h2>
             
             <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ backgroundColor: "rgba(255, 255, 255, 1)" }}
+              transition={{ duration: 0.2 }}
             >
               <Button
                 size="lg"
-                className="w-full py-6 text-base sm:text-lg font-medium bg-white text-black hover:bg-white/90 transition-all duration-200 tracking-wide flex flex-col items-center"
+                className="w-full py-6 px-6 text-left bg-white/95 hover:bg-white text-black transition-all duration-200 flex items-center justify-between min-h-[72px] rounded-lg border border-zinc-800 hover:border-white group"
                 onClick={() => router.push('/plaintiff')}
               >
-                <span>Plaintiff / Claimant</span>
-                <span className="text-xs sm:text-sm font-normal mt-1 opacity-70">
-                  File an intake or get legal assistance
-                </span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-base font-semibold tracking-tight">
+                    Plaintiff / Claimant
+                  </span>
+                  <span className="text-xs text-zinc-600 font-normal">
+                    File an intake or get legal assistance
+                  </span>
+                </div>
+                <svg 
+                  className="w-5 h-5 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all duration-200" 
+                  fill="none" 
+                  strokeWidth="2" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </Button>
             </motion.div>
 
             <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ backgroundColor: "rgba(255, 255, 255, 1)" }}
+              transition={{ duration: 0.2 }}
             >
               <Button
                 size="lg"
-                className="w-full py-6 text-base sm:text-lg font-medium bg-primary text-white hover:bg-primary/90 transition-all duration-200 tracking-wide flex flex-col items-center"
+                className="w-full py-6 px-6 text-left bg-white/95 hover:bg-white text-black transition-all duration-200 flex items-center justify-between min-h-[72px] rounded-lg border border-zinc-800 hover:border-white group"
                 onClick={() => router.push('/lawyer')}
               >
-                <span>Lawyer / Attorney</span>
-                <span className="text-xs sm:text-sm font-normal mt-1 opacity-70">
-                  Review intakes and research cases
-                </span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-base font-semibold tracking-tight">
+                    Lawyer / Attorney
+                  </span>
+                  <span className="text-xs text-zinc-600 font-normal">
+                    Review intakes and research cases
+                  </span>
+                </div>
+                <svg 
+                  className="w-5 h-5 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all duration-200" 
+                  fill="none" 
+                  strokeWidth="2" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </Button>
             </motion.div>
           </div>
